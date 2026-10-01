@@ -56,13 +56,10 @@ npm run build
 ```
 The compiled files will be output to the `dist/` directory, ready to be deployed to GitHub Pages, Vercel, Netlify, or any static hosting service.
 
-## 📁 Project Structure
-
-For a detailed breakdown of the codebase architecture and DOM Z-index layering, please refer to our [`architecture.md`](./architecture.md) and [`claude.md`](./claude.md) files.
 
 ## 🤝 Contributing
 
-This project is maintained by the IEEE RGIPT Student Chapter. If you'd like to contribute, please fork the repository and open a pull request. Make sure to adhere to the design principles outlined in the AI guidelines document!
+This project is maintained by the IEEE RGIPT Student Chapter. If you'd like to contribute, please fork the repository and open a pull request. Make sure to adhere to the design principles.
 
 ## 📝 License
 
