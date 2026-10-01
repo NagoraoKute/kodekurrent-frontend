@@ -1,0 +1,1390 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Design tokens ---------- */
+:root {
+    --poke-yellow: #ffcb05;
+    --poke-blue: #3b4cca;
+}
+
+/* ---------- Custom Pokémon font ----------
+   Drop the licensed font files into /public/fonts/.
+   Until they exist, the fallback stack in .pokemon-title is used. */
+@font-face {
+    font-family: 'Pokemon Solid';
+    src:
+        url('/fonts/PokemonSolid.woff2') format('woff2'),
+        url('/fonts/PokemonSolid.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ---------- Typography: official logo style ---------- */
+@layer components {
+    .pokemon-title {
+        font-family: 'Pokemon Solid', Impact, 'Arial Black', sans-serif;
+        color: var(--poke-yellow);
+
+        /* The primary blue outline */
+        -webkit-text-stroke: 3px var(--poke-blue);
+        paint-order: stroke fill;
+        letter-spacing: 0.08em;
+
+        /* Layered shadows to create the 3D extrusion block */
+        text-shadow:
+            3px 3px 0 #2a3b8f,
+            4px 4px 0 #2a3b8f,
+            5px 5px 0 #2a3b8f,
+            6px 6px 0 #2a3b8f,
+            7px 7px 0 #2a3b8f,
+            8px 8px 0 #2a3b8f,
+            9px 9px 0 #2a3b8f,
+            10px 10px 0 #2a3b8f,
+            11px 11px 0 #2a3b8f,
+            12px 12px 0 #2a3b8f,
+            /* Final drop shadow for depth against the background */
+            15px 15px 15px rgba(0, 0, 0, 0.4);
+
+        /* Smooth scaling */
+        transform: perspective(500px) rotateX(5deg);
+    }
+}
+
+/* ---------- Nav label: slimmer outline & shadow for small text ---------- */
+.pokemon-title--sm {
+    -webkit-text-stroke-width: 1px;
+    letter-spacing: 0.04em;
+    /* Reduce the massive 3D block shadow so small nav text remains readable */
+    text-shadow:
+        2px 2px 0 #2a3b8f,
+        3px 3px 0 #2a3b8f,
+        4px 4px 5px rgba(0, 0, 0, 0.5);
+    transform: none;
+    /* Keep nav tabs flat and crisp */
+}
+
+/* ---------- CSS 3D Pokéball (navigation) ----------
+   Lit from the upper left: hotspot + terminator shading over the body colours. */
+.nav-ball {
+    position: relative;
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background:
+        /* specular hotspot */
+        radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.95) 0 4%, rgba(255, 255, 255, 0.35) 10%, rgba(255, 255, 255, 0) 26%),
+        /* sphere shading */
+        radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0) 35%, rgba(0, 0, 0, 0.18) 62%, rgba(0, 0, 0, 0.55) 100%),
+        /* red top, black band, white bottom */
+        linear-gradient(to bottom, #e8252b 0 43%, #141414 43% 57%, #f7f7f7 57% 100%);
+    box-shadow:
+        inset -0.25rem -0.4rem 0.6rem rgba(0, 0, 0, 0.35),
+        inset 0.15rem 0.15rem 0.3rem rgba(255, 255, 255, 0.25),
+        0 0.6rem 0.5rem -0.25rem rgba(0, 0, 0, 0.5);
+    transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.25s ease;
+}
+
+/* Scale up the balls slightly on larger screens so they aren't too tiny */
+@media (min-width: 640px) {
+    .nav-ball {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+}
+
+/* centre button */
+.nav-ball::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 34%;
+    height: 34%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 0.18rem solid #141414;
+    background: radial-gradient(circle at 35% 30%, #fff 0 20%, #ececec 55%, #bdbdbd 100%);
+    box-shadow:
+        0 0.1rem 0.2rem rgba(0, 0, 0, 0.55),
+        inset -0.1rem -0.1rem 0.15rem rgba(0, 0, 0, 0.25);
+    transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* glossy highlight on the red dome */
+.nav-ball::after {
+    content: '';
+    position: absolute;
+    inset: 7% 20% 58% 15%;
+    border-radius: 50%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
+    transform: rotate(-24deg);
+    pointer-events: none;
+}
+
+/* active tab: raised, glowing, gently bobbing */
+.nav-tab.is-active .nav-ball {
+    transform: translateY(-0.2rem) scale(1.12);
+    box-shadow:
+        inset -0.25rem -0.4rem 0.6rem rgba(0, 0, 0, 0.35),
+        inset 0.15rem 0.15rem 0.3rem rgba(255, 255, 255, 0.25),
+        0 0.8rem 0.6rem -0.25rem rgba(0, 0, 0, 0.5),
+        0 0 1rem 0.25rem rgba(255, 203, 5, 0.65);
+    animation: ball-bob 2s ease-in-out infinite;
+}
+
+.nav-tab.is-active .nav-ball::before {
+    background: radial-gradient(circle at 35% 30%, #fffbe0 0 20%, #ffe66b 60%, #ffcb05 100%);
+    box-shadow: 0 0 0.5rem 0.1rem rgba(255, 203, 5, 0.9), inset -0.1rem -0.1rem 0.15rem rgba(0, 0, 0, 0.2);
+}
+
+/* hover / keyboard focus: catch-style wiggle (declared after .is-active so it wins) */
+.nav-tab:hover .nav-ball,
+.nav-tab:focus-visible .nav-ball {
+    animation: ball-wiggle 0.6s ease-in-out;
+}
+
+.nav-tab:active .nav-ball {
+    scale: 0.92;
+}
+
+/* ==========================================================================
+   Kanto Pokédex (FAQ)
+   Raw CSS because of the stacked box-shadows, gradients and glass effects.
+   ========================================================================== */
+
+/* ---------- Red plastic casing ---------- */
+.pokedex {
+    position: relative;
+    padding: 1rem;
+    border: 4px solid #6e0d0a;
+    border-radius: 1.75rem 1.75rem 1.25rem 1.25rem;
+    background:
+        linear-gradient(160deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 28%),
+        /* plastic sheen */
+        linear-gradient(180deg, #e8332f 0%, #c41e1a 55%, #9b1410 100%);
+    box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.38),
+        /* top bevel highlight */
+        inset 0 -6px 0 rgba(0, 0, 0, 0.28),
+        /* bottom bevel shadow */
+        inset 6px 0 10px rgba(255, 255, 255, 0.12),
+        inset -8px 0 14px rgba(0, 0, 0, 0.25),
+        0 0.4rem 0 #7a0f0c,
+        /* extruded edge */
+        0 1.5rem 2.5rem -0.5rem rgba(0, 0, 0, 0.55);
+    /* drop shadow */
+}
+
+@media (min-width: 640px) {
+    .pokedex {
+        padding: 1.5rem;
+    }
+}
+
+.pokedex__top {
+    padding-bottom: 1rem;
+    border-bottom: 0.3rem solid rgba(0, 0, 0, 0.28);
+    box-shadow: 0 0.2rem 0 rgba(255, 255, 255, 0.18);
+}
+
+/* ---------- Blue glass lens ---------- */
+.pokedex__lens {
+    flex: none;
+    width: 4.75rem;
+    height: 4.75rem;
+    border: 0.45rem solid #f4f4f4;
+    /* white ring */
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.95) 0 6%, rgba(255, 255, 255, 0.35) 12%, transparent 28%),
+        /* specular */
+        radial-gradient(circle at 68% 78%, rgba(0, 40, 120, 0.65), transparent 55%),
+        /* depth */
+        radial-gradient(circle at 50% 50%, #7fd4ff 0%, #2c8df0 45%, #0b3fa8 100%);
+    box-shadow:
+        0 0 0 0.25rem #3a3a3a,
+        /* dark outer rim */
+        inset 0 0 0.9rem rgba(0, 30, 100, 0.8),
+        0 0.4rem 0.6rem rgba(0, 0, 0, 0.5),
+        0 0 1.3rem rgba(80, 180, 255, 0.6);
+    /* glow */
+    animation: pokedex-lens-pulse 3s ease-in-out infinite;
+}
+
+@media (min-width: 640px) {
+    .pokedex__lens {
+        width: 5.5rem;
+        height: 5.5rem;
+    }
+}
+
+/* ---------- Status LEDs ---------- */
+.pokedex__led {
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(0, 0, 0, 0.45);
+    border-radius: 50%;
+    box-shadow:
+        inset -2px -2px 3px rgba(0, 0, 0, 0.35),
+        inset 2px 2px 3px rgba(255, 255, 255, 0.55),
+        0 0 0.5rem currentColor;
+}
+
+.pokedex__led--red {
+    color: #ff5a55;
+    background: radial-gradient(circle at 35% 30%, #ffb3b3, #e53935 55%, #8e1210);
+}
+
+.pokedex__led--yellow {
+    color: #ffd94a;
+    background: radial-gradient(circle at 35% 30%, #fff3b0, #fbc02d 55%, #8a6100);
+}
+
+.pokedex__led--green {
+    color: #5dff7a;
+    background: radial-gradient(circle at 35% 30%, #c8ffd2, #2ecc40 55%, #0e5a1c);
+}
+
+.pokedex.is-typing .pokedex__led--green {
+    animation: pokedex-led 0.25s steps(2) infinite;
+}
+
+/* "data transfer" */
+
+.pokedex__stamp {
+    font-family: ui-monospace, 'Courier New', monospace;
+    font-weight: 800;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #8e1210;
+    /* embossed into the plastic */
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35), 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- Screens ---------- */
+.pokedex__bezel {
+    display: flex;
+    flex: 1 1 auto;
+    padding: 0.9rem;
+    border-radius: 1rem 1rem 2rem 1rem;
+    background: linear-gradient(145deg, #f2f2f2, #b9b9b9);
+    box-shadow:
+        inset 0 2px 0 #fff,
+        inset 0 -4px 0 rgba(0, 0, 0, 0.25),
+        0 3px 0 #6e0d0a,
+        0 8px 14px rgba(0, 0, 0, 0.45);
+}
+
+.pokedex__screen {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 17rem;
+    padding: 1rem;
+    overflow: hidden;
+    border-radius: 0.6rem;
+    box-shadow:
+        inset 0 0 0 3px rgba(0, 0, 0, 0.65),
+        inset 0 0.6rem 1.4rem rgba(0, 0, 0, 0.45),
+        inset 0 -0.3rem 0.8rem rgba(255, 255, 255, 0.1),
+        0 2px 0 #fff;
+}
+
+@media (min-width: 768px) {
+    .pokedex__screen {
+        min-height: 21rem;
+    }
+}
+
+/* Glass glare + scanlines */
+.pokedex__screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(125deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 32%),
+        repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.07) 0 1px, transparent 1px 3px);
+}
+
+.pokedex__screen--main {
+    color: #12331a;
+    background: radial-gradient(ellipse at 50% 35%, #dcebb4 0%, #b7cd86 100%);
+}
+
+.pokedex__screen--list {
+    background: radial-gradient(ellipse at 50% 20%, #17335f 0%, #0a1830 85%);
+}
+
+/* ---------- Typed text ---------- */
+.pokedex__text {
+    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 1px rgba(18, 51, 26, 0.5);
+}
+
+.pokedex__cursor {
+    display: inline-block;
+    width: 0.6em;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: -0.12em;
+    background: currentColor;
+    animation: pokedex-blink 1s steps(1) infinite;
+}
+
+.pokedex.is-typing .pokedex__cursor {
+    animation: none;
+    opacity: 1;
+}
+
+/* solid while typing */
+
+/* ---------- Retro question buttons ---------- */
+.pokedex__q {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0.7rem 0.9rem 0.7rem 2.1rem;
+    text-align: left;
+    font-family: ui-monospace, 'Courier New', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #1a1a40;
+    cursor: pointer;
+    border: 3px solid #3b4cca;
+    border-radius: 0.5rem;
+    background: linear-gradient(#ffe066, #ffcb05);
+    box-shadow:
+        inset 0 2px 0 rgba(255, 255, 255, 0.65),
+        0 4px 0 #1f2a80,
+        0 6px 8px rgba(0, 0, 0, 0.4);
+    transition: transform 0.08s, box-shadow 0.08s, background 0.15s, color 0.15s;
+}
+
+.pokedex__q::before {
+    /* menu arrow */
+    content: '\25B6';
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
+    opacity: 0;
+}
+
+.pokedex__q:hover,
+.pokedex__q:focus-visible {
+    transform: translateY(-1px);
+}
+
+.pokedex__q:hover::before,
+.pokedex__q:focus-visible::before {
+    opacity: 1;
+}
+
+.pokedex__q:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+}
+
+.pokedex__q:active {
+    transform: translateY(3px);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 1px 0 #1f2a80;
+}
+
+/* Selected entry: pressed in, blue, with a blinking arrow */
+.pokedex__q.is-active {
+    color: #ffcb05;
+    background: linear-gradient(#4a5be0, #3b4cca);
+    transform: translateY(3px);
+    box-shadow:
+        inset 0 3px 0 rgba(0, 0, 0, 0.35),
+        0 1px 0 #1f2a80,
+        0 0 0.9rem rgba(255, 203, 5, 0.45);
+}
+
+.pokedex__q.is-active::before {
+    opacity: 1;
+    animation: pokedex-arrow 0.6s steps(1) infinite;
+}
+
+/* ---------- Hinge + decorative hardware ---------- */
+.pokedex__hinge {
+    width: 0.9rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(90deg, #5a0a08, #a31510 40%, #5a0a08);
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.08);
+}
+
+.pokedex__button {
+    display: block;
+    width: 2.2rem;
+    height: 2.2rem;
+    border: 3px solid rgba(0, 0, 0, 0.45);
+    border-radius: 50%;
+    box-shadow: inset -3px -3px 5px rgba(0, 0, 0, 0.35), inset 3px 3px 5px rgba(255, 255, 255, 0.5), 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.pokedex__button--blue {
+    background: radial-gradient(circle at 35% 30%, #a8d4ff, #2c6fe0 60%, #123a8a);
+}
+
+.pokedex__button--green {
+    background: radial-gradient(circle at 35% 30%, #c8ffd2, #2ecc40 60%, #0e5a1c);
+}
+
+.pokedex__speaker {
+    display: block;
+    width: 5rem;
+    height: 1.5rem;
+    border-radius: 0.4rem;
+    background: repeating-linear-gradient(to bottom, #4a0806 0 0.25rem, transparent 0.25rem 0.5rem);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.pokedex__dpad {
+    position: relative;
+    display: block;
+    width: 3.6rem;
+    height: 3.6rem;
+}
+
+.pokedex__dpad::before,
+.pokedex__dpad::after {
+    content: '';
+    position: absolute;
+    background: linear-gradient(#3a3a3a, #141414);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25), 0 3px 0 rgba(0, 0, 0, 0.45);
+    border-radius: 0.3rem;
+}
+
+.pokedex__dpad::before {
+    inset: 33% 0;
+}
+
+/* horizontal bar */
+.pokedex__dpad::after {
+    inset: 0 33%;
+}
+
+/* vertical bar */
+.pokedex__pill {
+    display: block;
+    width: 2.6rem;
+    height: 0.7rem;
+    border-radius: 0.35rem;
+    background: #2b2b2b;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2), 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   Professor Oak chat widget
+   ========================================================================== */
+
+/* Avatar width: matches the <img> width in the HTML; also positions the speech tail */
+.oak-chat {
+    --oak-w: 112px;
+}
+
+@media (min-width: 640px) {
+    .oak-chat {
+        --oak-w: 140px;
+    }
+}
+
+/* ---------- Collapsed: the full standing character ---------- */
+.oak-avatar {
+    position: relative;
+    display: block;
+    padding: 0;
+    cursor: pointer;
+    transform-origin: 50% 100%;
+    /* hover/press scale from his feet so he doesn't drift off the corner */
+    transition: transform 0.15s cubic-bezier(0.3, 1.6, 0.5, 1);
+    animation: oak-bounce 2.4s ease-in-out infinite;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.oak-avatar:hover {
+    transform: scale(1.06);
+}
+
+.oak-avatar:active {
+    transform: scale(0.94);
+}
+
+.oak-avatar:focus-visible {
+    outline: 3px solid #3b4cca;
+    outline-offset: 4px;
+}
+
+.oak-avatar[aria-expanded='true'] {
+    animation: none;
+}
+
+/* stand still while talking */
+
+/* "!" nudge badge, hidden after the first open.
+   Tucked just above-right of his head: tweak `top`/`right` to match your PNG.
+   (Toggled with .is-seen rather than Tailwind's `hidden`: this rule's `display` would override it.) */
+.oak-badge {
+    position: absolute;
+    top: 0.15rem;
+    right: 1.6rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #e53935;
+    color: #fff;
+    font: 800 0.85rem/1 ui-monospace, 'Courier New', monospace;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+    animation: oak-badge-pulse 1.2s ease-in-out infinite;
+}
+
+.oak-badge.is-seen {
+    display: none;
+}
+
+/* ---------- Expanded: classic Pokémon dialogue box ---------- */
+.oak-box {
+    padding: 1.6rem 1.25rem 1.1rem;
+    color: #1a1a40;
+    background: #fff;
+    border: 4px solid #1a1a40;
+    /* thick outer border */
+    border-radius: 0.9rem;
+    box-shadow:
+        inset 0 0 0 4px #fff,
+        /* white gap */
+        inset 0 0 0 7px #3b4cca,
+        /* inner blue line: together they read as a double border */
+        0 5px 0 #0d0d26,
+        /* extruded edge */
+        0 14px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Speech tail pointing down at his head. It is centred over the avatar's width, and its
+   white fill breaks the border, like the games. The box sits directly above the standing
+   avatar (bottom: 100% of the widget, plus the margin from the HTML). */
+.oak-box::after {
+    content: '';
+    position: absolute;
+    right: calc(var(--oak-w) / 2 - 0.55rem);
+    /* tail centre = avatar centre */
+    bottom: -0.7rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: #fff;
+    border-right: 4px solid #1a1a40;
+    border-bottom: 4px solid #1a1a40;
+    transform: rotate(45deg);
+}
+
+/* Name tag straddling the top border */
+.oak-box__name {
+    position: absolute;
+    top: -0.9rem;
+    left: 1rem;
+    padding: 0.1rem 0.6rem;
+    font: 800 0.75rem/1.4 ui-monospace, 'Courier New', monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #1a1a40;
+    background: #ffcb05;
+    border: 3px solid #1a1a40;
+    border-radius: 0.4rem;
+    box-shadow: 0 2px 0 #0d0d26;
+}
+
+.oak-box__close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.65rem;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    cursor: pointer;
+    font: 800 0.75rem/1 ui-monospace, 'Courier New', monospace;
+    color: #1a1a40;
+    background: #fff;
+    border: 2px solid #1a1a40;
+    border-radius: 0.3rem;
+    box-shadow: 0 2px 0 #0d0d26;
+}
+
+.oak-box__close:hover {
+    background: #ffcb05;
+}
+
+.oak-box__close:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+.oak-box__close:focus-visible {
+    outline: 3px solid #3b4cca;
+    outline-offset: 2px;
+}
+
+/* ---------- Typing cursor + "press A" arrow ---------- */
+.oak-cursor {
+    display: none;
+    /* only while typing */
+    width: 0.6em;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: -0.12em;
+    background: currentColor;
+}
+
+.oak-chat.is-typing .oak-cursor {
+    display: inline-block;
+}
+
+/* solid while typing */
+
+.oak-box__next {
+    position: absolute;
+    right: 1.4rem;
+    bottom: 0.8rem;
+    font-size: 0.8rem;
+    opacity: 0;
+}
+
+.oak-chat.is-done .oak-box__next {
+    opacity: 1;
+    animation: pokedex-blink 0.8s steps(1) infinite;
+    /* shared keyframes, defined for the Pokédex */
+}
+
+/* ==========================================================================
+   Schedule: Pokémon Route timeline
+   Layout lives in Tailwind (HTML); this is the route line, connectors, Pokéball nodes and finish star.
+   ========================================================================== */
+.route {
+    --route-x: 1rem;
+    /* x of the route line (mobile: left-aligned) */
+    --route-link: 2.25rem;
+    /* connector length: line centre -> card edge */
+    position: relative;
+}
+
+@media (min-width: 768px) {
+    .route {
+        --route-x: 50%;
+        /* desktop: centred */
+        --route-link: 2.75rem;
+    }
+}
+
+/* Thick dashed route: yellow dashes with a navy outline (drop-shadow follows the dash shapes) */
+.route::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--route-x);
+    width: 8px;
+    margin-left: -4px;
+    background: repeating-linear-gradient(to bottom, #ffcb05 0 16px, transparent 16px 30px);
+    filter:
+        drop-shadow(3px 0 0 #1a1a40) drop-shadow(-3px 0 0 #1a1a40) drop-shadow(0 3px 0 #1a1a40) drop-shadow(0 -3px 0 #1a1a40);
+}
+
+/* Connector from each card to the route (aligned with the time strip, which is 1.8rem tall) */
+.route__card::after {
+    content: '';
+    position: absolute;
+    top: calc(0.9rem - 3px);
+    right: 100%;
+    width: var(--route-link);
+    height: 6px;
+    background: #1a1a40;
+}
+
+@media (min-width: 768px) {
+
+    /* Left-hand cards connect on their right side */
+    .route__item[data-side='left'] .route__card::after {
+        right: auto;
+        left: 100%;
+    }
+}
+
+/* ---------- Pokéball node ----------
+   Centred with margin (not transform) so GSAP's transform animations can't displace it. */
+.route__node {
+    position: absolute;
+    top: 0.15rem;
+    left: var(--route-x);
+    z-index: 2;
+    width: 2rem;
+    height: 2rem;
+    margin-left: -1rem;
+    border: 3px solid #1a1a40;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.9) 0 5%, rgba(255, 255, 255, 0) 26%),
+        /* highlight */
+        radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.35) 100%),
+        /* shading */
+        linear-gradient(to bottom, #e8252b 0 42%, #1a1a40 42% 58%, #f7f7f7 58% 100%);
+    /* red / band / white */
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.route__node::before {
+    /* centre button */
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40%;
+    height: 40%;
+    transform: translate(-50%, -50%);
+    border: 2px solid #1a1a40;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff 0 25%, #e6e6e6 60%, #bdbdbd 100%);
+}
+
+/* Hovering a card wiggles its ball (keyframes live in animations.css) */
+.route__item:hover .route__node {
+    animation: ball-wiggle 0.6s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .route__item:hover .route__node {
+        animation: none;
+    }
+}
+
+/* ---------- Finish star ---------- */
+.route__end {
+    position: relative;
+    z-index: 2;
+    height: 2.75rem;
+    /* The outline sits on this wrapper because clip-path would cut it off on the star itself */
+    filter:
+        drop-shadow(3px 0 0 #1a1a40) drop-shadow(-3px 0 0 #1a1a40) drop-shadow(0 3px 0 #1a1a40) drop-shadow(0 -3px 0 #1a1a40);
+}
+
+.route__end::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: var(--route-x);
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-left: -1.375rem;
+    background: linear-gradient(160deg, #fff3a0, #ffcb05 55%, #e0a800);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+/* ==========================================================================
+   Team & Contact
+   ========================================================================== */
+
+/* ---------- Marquee ---------- */
+.marquee {
+    --marquee-duration: 50s;
+    position: relative;
+    padding: 2.5rem 0;
+    /* room for the cards' tilt and shadows, which overflow clipping would cut */
+    overflow-x: auto;
+    /* fallback (no JS / reduced motion): a normal scrollable row */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.marquee.is-running {
+    overflow: hidden;
+}
+
+.marquee__track {
+    display: flex;
+    width: max-content;
+}
+
+/* Trailing padding (not just gap) so the seam between the two copies has the same spacing as every other pair */
+.marquee__group {
+    display: flex;
+    gap: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.marquee.is-running .marquee__track {
+    animation: team-marquee var(--marquee-duration) linear infinite;
+    will-change: transform;
+}
+
+.marquee.is-running:hover .marquee__track,
+.marquee.is-running:focus-within .marquee__track {
+    animation-play-state: paused;
+}
+
+/* ---------- Pokémon TCG card ---------- */
+.tcg {
+    --tcg-tint: #fff6c2;
+    /* card face; overridden per type below */
+    --tcg-art-a: #fff1a0;
+    --tcg-art-b: #f5b800;
+    position: relative;
+    isolation: isolate;
+    /* the foil's blend modes stay inside the card */
+    flex: none;
+    width: 15rem;
+    aspect-ratio: 5 / 7;
+    padding: 0.5rem;
+    color: #1a1a2e;
+    user-select: none;
+    background: linear-gradient(145deg, #fff08a 0%, #ffcb05 40%, #e0a800 100%);
+    /* retro yellow border */
+    border: 3px solid #8a6100;
+    border-radius: 0.9rem;
+    box-shadow:
+        inset 0 0 0 2px rgba(255, 255, 255, 0.55),
+        0 0.5rem 0 rgba(0, 0, 0, 0.25),
+        0 1rem 1.5rem rgba(0, 0, 0, 0.35);
+}
+
+.tcg:hover {
+    z-index: 5;
+}
+
+.tcg:focus-visible {
+    outline: 4px solid #3b4cca;
+    outline-offset: 4px;
+}
+
+.tcg--lightning {
+    --tcg-tint: #fff6c2;
+    --tcg-art-a: #fff1a0;
+    --tcg-art-b: #f5b800;
+}
+
+.tcg--fire {
+    --tcg-tint: #ffe2d1;
+    --tcg-art-a: #ffc09a;
+    --tcg-art-b: #e8541f;
+}
+
+.tcg--water {
+    --tcg-tint: #dcf1ff;
+    --tcg-art-a: #a9e0ff;
+    --tcg-art-b: #2a7fd6;
+}
+
+.tcg--grass {
+    --tcg-tint: #e0f7d8;
+    --tcg-art-a: #b6ecab;
+    --tcg-art-b: #3fa24a;
+}
+
+.tcg--psychic {
+    --tcg-tint: #f0e0ff;
+    --tcg-art-a: #dcb8ff;
+    --tcg-art-b: #8a45c9;
+}
+
+.tcg--fighting {
+    --tcg-tint: #f3e3d0;
+    --tcg-art-a: #e5be94;
+    --tcg-art-b: #9a5a28;
+}
+
+.tcg--colorless {
+    --tcg-tint: #efefef;
+    --tcg-art-a: #e8e8e8;
+    --tcg-art-b: #a8a8a8;
+}
+
+.tcg__frame {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    height: 100%;
+    padding: 0.4rem 0.45rem;
+    background: var(--tcg-tint);
+    border: 2px solid #8a6100;
+    border-radius: 0.45rem;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+/* Header: stage, name, HP + type */
+.tcg__head {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.tcg__stage {
+    padding: 0.1rem 0.3rem;
+    font-size: 0.5rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #fff;
+    background: #1a1a2e;
+    border-radius: 0.15rem;
+}
+
+.tcg__name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 0.8rem;
+    font-weight: 800;
+    line-height: 1.1;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tcg__hp {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.tcg__hp small {
+    font-size: 0.5rem;
+}
+
+/* Art window with a silhouette placeholder (a .tcg__photo covers it) */
+.tcg__art {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 3px solid #c9a227;
+    background:
+        radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.7), transparent 40%),
+        linear-gradient(160deg, var(--tcg-art-a), var(--tcg-art-b));
+    box-shadow: inset 0 0 0 2px #fff6c4, inset 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.tcg__art::before,
+/* head */
+.tcg__art::after {
+    /* shoulders */
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26, 26, 46, 0.35);
+}
+
+.tcg__art::before {
+    top: 22%;
+    width: 34%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+
+.tcg__art::after {
+    top: 58%;
+    width: 68%;
+    height: 60%;
+    border-radius: 50% 50% 0 0;
+}
+
+.tcg__photo {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tcg__dex {
+    padding: 0.1rem 0;
+    font-size: 0.55rem;
+    font-style: italic;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.4);
+    border-top: 1px solid rgba(138, 97, 0, 0.5);
+    border-bottom: 1px solid rgba(138, 97, 0, 0.5);
+}
+
+/* Attacks = roles */
+.tcg__attacks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0.1rem 0;
+}
+
+.tcg__attack {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-top: 0.25rem;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    border-top: 1px dashed rgba(26, 26, 46, 0.35);
+}
+
+.tcg__attack:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.tcg__cost {
+    display: flex;
+    flex: none;
+    gap: 0.15rem;
+}
+
+.tcg__move {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tcg__dmg {
+    flex: none;
+    font-size: 0.85rem;
+}
+
+.tcg__foot {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 0.25rem;
+    font-size: 0.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-top: 1px solid rgba(138, 97, 0, 0.5);
+}
+
+.tcg__foot span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+/* Energy / type icons */
+.tcg__type {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    border: 1.5px solid rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff 0 12%, var(--t1) 13%, var(--t2) 100%);
+    box-shadow: inset -1px -1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.tcg__foot .tcg__type {
+    width: 0.8rem;
+    height: 0.8rem;
+}
+
+.tcg__type--lightning {
+    --t1: #ffe34d;
+    --t2: #e0a800;
+}
+
+.tcg__type--fire {
+    --t1: #ff7a4d;
+    --t2: #c62800;
+}
+
+.tcg__type--water {
+    --t1: #5cc8ff;
+    --t2: #0b64c9;
+}
+
+.tcg__type--grass {
+    --t1: #7be07b;
+    --t2: #1f8f3a;
+}
+
+.tcg__type--psychic {
+    --t1: #d59bff;
+    --t2: #7b2fb8;
+}
+
+.tcg__type--fighting {
+    --t1: #e0a36a;
+    --t2: #8a4b1c;
+}
+
+.tcg__type--colorless {
+    --t1: #f4f4f4;
+    --t2: #9a9a9a;
+}
+
+.tcg__type--lightning::after {
+    /* bolt */
+    content: '';
+    position: absolute;
+    inset: 18%;
+    background: #1a1a2e;
+    clip-path: polygon(55% 0, 15% 55%, 45% 55%, 35% 100%, 85% 40%, 55% 40%);
+}
+
+/* ---------- Holographic foil ----------
+   A rainbow layer and a specular glare, both following --mx/--my, which TeamContact.js
+   updates from vanilla-tilt's `tiltChange` event. Hidden until hover/focus. */
+.tcg::before,
+.tcg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tcg::before {
+    background: repeating-linear-gradient(115deg,
+            #ff3d9a 0%, #ffd23d 9%, #3dffb0 18%, #3db8ff 27%, #a45dff 36%, #ff3d9a 45%);
+    background-size: 260% 260%;
+    background-position: var(--mx, 50%) var(--my, 50%);
+    mix-blend-mode: color-dodge;
+    filter: brightness(0.8) contrast(1.4);
+}
+
+.tcg::after {
+    background: radial-gradient(farthest-corner circle at var(--mx, 50%) var(--my, 50%),
+            rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.25) 22%, rgba(0, 0, 0, 0.35) 100%);
+    mix-blend-mode: overlay;
+}
+
+.tcg:hover::before,
+.tcg:focus-visible::before {
+    opacity: 0.8;
+}
+
+.tcg:hover::after,
+.tcg:focus-visible::after {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   Contact form: Bill's PC / Game Boy battle menu
+   ========================================================================== */
+
+/* Optional pixel font. Drop PressStart2P-Regular.woff2 (SIL OFL) into public/fonts/;
+   until it exists the mono fallback below is used. */
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('/fonts/PressStart2P-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.pc {
+    padding: 1rem;
+    font-family: 'Press Start 2P', ui-monospace, 'Courier New', monospace;
+    font-size: 0.65rem;
+    line-height: 1.8;
+    color: #000;
+    -webkit-font-smoothing: none;
+    background: linear-gradient(#dfe3e8, #aeb4bc);
+    /* grey plastic monitor casing */
+    border: 6px solid #1a1a2e;
+    border-radius: 0.9rem;
+    box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.7),
+        inset 0 -4px 0 rgba(0, 0, 0, 0.25),
+        0 0.5rem 0 #0d0d26,
+        0 1.2rem 1.8rem rgba(0, 0, 0, 0.4);
+}
+
+@media (min-width: 640px) {
+    .pc {
+        padding: 1.5rem;
+        font-size: 0.7rem;
+    }
+}
+
+.pc__screen {
+    position: relative;
+    padding: 1rem;
+    background: radial-gradient(ellipse at 50% 20%, #17407a 0%, #0a1a3a 85%);
+    border: 4px solid #0d0d26;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 0 1.5rem rgba(0, 0, 0, 0.6);
+}
+
+/* Glare + scanlines sit UNDER the window so the form itself stays crisp */
+.pc__screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(125deg, rgba(255, 255, 255, 0.14), transparent 30%),
+        repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.12) 0 1px, transparent 1px 3px);
+}
+
+.pc__bar {
+    position: relative;
+    z-index: 2;
+    color: #ffcb05;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* White window with a double border, like the in-game menus */
+.pc__window {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem;
+    background: #fff;
+    border: 4px solid #000;
+    box-shadow: inset 0 0 0 4px #fff, inset 0 0 0 7px #000;
+}
+
+.pc__label {
+    text-transform: uppercase;
+}
+
+.pc__label::before {
+    /* menu arrow: dim at rest, blinking while the field is focused */
+    content: '\25B6';
+    margin-right: 0.5rem;
+    opacity: 0.25;
+}
+
+.pc__field:focus-within .pc__label::before {
+    opacity: 1;
+    animation: pokedex-blink 0.8s steps(1) infinite;
+    /* shared keyframes, defined for the Pokédex */
+}
+
+.pc__input {
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    font: inherit;
+    color: #000;
+    text-transform: uppercase;
+    background: #fff;
+    border: 4px solid #000;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.pc__input::placeholder {
+    color: #6b6b6b;
+}
+
+.pc__input:focus {
+    background: #fff3a0;
+    box-shadow: 4px 4px 0 #3b4cca;
+    outline: 3px solid #3b4cca;
+    outline-offset: 2px;
+}
+
+.pc__input:invalid:not(:placeholder-shown):not(:focus) {
+    background: #ffe0e0;
+}
+
+/* Battle-menu buttons (FIGHT / RUN style) */
+.pc__btn {
+    padding: 0.9rem 1rem;
+    font: inherit;
+    text-align: left;
+    text-transform: uppercase;
+    color: #000;
+    cursor: pointer;
+    background: #fff;
+    border: 4px solid #000;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.pc__btn--primary {
+    background: #ffcb05;
+}
+
+.pc__btn::before {
+    /* selection cursor, shown on hover/focus */
+    content: '\25B6';
+    margin-right: 0.6rem;
+    visibility: hidden;
+}
+
+.pc__btn:hover::before,
+.pc__btn:focus-visible::before {
+    visibility: visible;
+    animation: pokedex-blink 0.8s steps(1) infinite;
+}
+
+.pc__btn:focus-visible {
+    outline: 3px solid #3b4cca;
+    outline-offset: 2px;
+}
+
+.pc__btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 #000;
+}
+
+.pc__btn:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+.pc__btn:disabled::before {
+    visibility: hidden;
+}
+
+/* Retro "Message sent!" box. Stays rendered when empty (collapsed, not display:none) so screen readers still announce it. */
+.pc__status {
+    position: relative;
+    padding: 1rem 2.2rem 1rem 1.2rem;
+    background: #fff;
+    border: 4px solid #000;
+    box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #000;
+}
+
+.pc__status::after {
+    /* "press A" arrow */
+    content: '\25BC';
+    position: absolute;
+    right: 0.8rem;
+    bottom: 0.4rem;
+    animation: pokedex-blink 0.8s steps(1) infinite;
+}
+
+.pc__status:empty {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+}
+
+.pc__status:empty::after {
+    content: none;
+}
+
+.pc__status--error {
+    background: #ffe0e0;
+}

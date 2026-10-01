@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Kodekurrent: the IEEE RGIPT hackathon, Pokémon Edition." />
+    <title>Kodekurrent | Pokémon Edition</title>
+    <link rel="preload" href="/fonts/PokemonSolid.woff2" as="font" type="font/woff2" crossorigin />
+    <noscript>
+        <style>
+            #intro-overlay {
+                display: none !important;
+            }
+        </style>
+    </noscript>
+</head>
+
+<body class="min-h-screen bg-gradient-to-b from-sky-400 via-sky-200 to-green-300 antialiased">
+    <!-- z-9999: Global Loader (Three.js canvas is mounted into #loader-canvas) -->
+    <div id="global-loader" role="status" aria-live="polite" aria-label="Loading" aria-busy="true"
+        class="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-2 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 transition-opacity duration-700 ease-out">
+        <div id="loader-canvas" class="h-56 w-56 sm:h-72 sm:w-72"></div>
+        <p class="pokemon-title text-2xl sm:text-3xl animate-pulse">Loading...</p>
+    </div>
+
+    <!-- z-500: Intro splash. Above the app and nav, below the transition overlay (999) and loader (9999) -->
+    <div id="intro-overlay" role="dialog" aria-modal="true" aria-label="Kodekurrent intro"
+        class="fixed inset-0 z-[500] bg-black">
+        <video id="intro-video" class="h-full w-full object-contain" src="/videos/intro.mp4" preload="auto" playsinline
+            disablepictureinpicture></video>
+
+        <!-- Retro skip button -->
+        <button id="intro-skip" type="button"
+            class="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))] border-4 border-poke-yellow bg-black px-4 py-2 font-mono text-sm font-bold uppercase tracking-widest text-poke-yellow shadow-[4px_4px_0_0_#3b4cca] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#3b4cca] active:translate-x-1 active:translate-y-1 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white">
+            Skip &#9654;&#9654;
+        </button>
+
+        <!-- Shown only when autoplay had to fall back to muted -->
+        <button id="intro-sound" type="button"
+            class="hidden absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))] border-4 border-white bg-black px-4 py-2 font-mono text-sm font-bold uppercase tracking-widest text-white shadow-[4px_4px_0_0_#3b4cca] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#3b4cca] active:translate-x-1 active:translate-y-1 active:shadow-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-poke-yellow">
+            &#9834; Sound on
+        </button>
+
+        <!-- Last-resort gate when even muted autoplay is blocked -->
+        <div id="intro-start" class="absolute inset-0 hidden items-center justify-center bg-black/70">
+            <button id="intro-start-btn" type="button"
+                class="pokemon-title animate-pulse px-6 py-4 text-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white sm:text-5xl">
+                Click to Start
+            </button>
+        </div>
+    </div>
+
+    <!-- z-100: Navigation (7 Tabs) -->
+    <header id="site-nav" class="fixed inset-x-0 top-0 z-[100]">
+        <nav aria-label="Primary"
+            class="mx-auto flex max-w-5xl items-end justify-between sm:justify-around gap-1 overflow-x-auto border-b-4 border-poke-blue bg-slate-900/80 px-2 pb-2 pt-3 backdrop-blur-md sm:rounded-b-2xl sm:border-x-4 scrollbar-none">
+            <a href="#home" data-target="home" data-pokemon="pikachu"
+                class="nav-tab flex flex-col items-center gap-1 rounded-xl px-1 sm:px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-yellow">
+                <span class="nav-ball" aria-hidden="true"></span>
+                <span class="pokemon-title pokemon-title--sm text-xs sm:text-base md:text-xl">Home</span>
+            </a>
+
+            <a href="#about" data-target="about" data-pokemon="charizard"
+                class="nav-tab flex flex-col items-center gap-1 rounded-xl px-1 sm:px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-yellow">
+                <span class="nav-ball" aria-hidden="true"></span>
+                <span class="pokemon-title pokemon-title--sm text-xs sm:text-base md:text-xl">About</span>
+            </a>
+
+            <a href="#schedule" data-target="schedule" data-pokemon="dragonite"
+                class="nav-tab flex flex-col items-center gap-1 rounded-xl px-1 sm:px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-yellow">
+                <span class="nav-ball" aria-hidden="true"></span>
+                <span class="pokemon-title pokemon-title--sm text-xs sm:text-base md:text-xl">Schedule</span>
+            </a>
+
+            <a href="#prizes" data-target="prizes" data-pokemon="meowth"
+                class="nav-tab flex flex-col items-center gap-1 rounded-xl px-1 sm:px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-yellow">
+                <span class="nav-ball" aria-hidden="true"></span>
+                <span class="pokemon-title pokemon-title--sm text-xs sm:text-base md:text-xl">Prizes</span>
+            </a>
+
+            <a href="#sponsors" data-target="sponsors" data-pokemon="blastoise"
+                class="nav-tab flex flex-col items-center gap-1 rounded-xl px-1 sm:px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-yellow">
+                <span class="nav-ball" aria-hidden="true"></span>
+                <span class="pokemon-title pokemon-title--sm text-xs sm:text-base md:text-xl">Sponsors</span>
+            </a>
+
+            <a href="#faqs" data-target="faqs" data-pokemon="venusaur"
+                class="nav-tab flex flex-col items-center gap-1 rounded-xl px-1 sm:px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-yellow">
+                <span class="nav-ball" aria-hidden="true"></span>
+                <span class="pokemon-title pokemon-title--sm text-xs sm:text-base md:text-xl">FAQs</span>
+            </a>
+
+            <a href="#contact" data-target="contact" data-pokemon="gengar"
+                class="nav-tab flex flex-col items-center gap-1 rounded-xl px-1 sm:px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-yellow">
+                <span class="nav-ball" aria-hidden="true"></span>
+                <span class="pokemon-title pokemon-title--sm text-xs sm:text-base md:text-xl">Contact</span>
+            </a>
+        </nav>
+    </header>
+
+    <!-- z-0: Main content -->
+    <main id="app" class="relative z-0">
+
+        <!-- 1. Home Section -->
+        <section id="home" data-gen="1"
+            class="flex min-h-screen flex-col items-center justify-center gap-4 px-4 pt-28 text-center">
+            <h1 class="pokemon-title text-5xl sm:text-7xl md:text-8xl">Kodekurrent</h1>
+            <p class="pokemon-title text-xl sm:text-3xl">Pokémon Edition</p>
+            <p class="font-mono text-sm text-slate-800">
+                Foundation check: if this title is yellow with a blue outline, styling works.
+            </p>
+        </section>
+
+        <!-- 2. About Section (Hidden by default) -->
+        <section id="about"
+            class="hidden flex min-h-screen flex-col items-center justify-center gap-4 px-4 pt-28 text-center">
+            <h1 class="pokemon-title text-5xl sm:text-7xl md:text-8xl">About</h1>
+            <p class="font-mono text-xl text-slate-800">Learn about the hackathon.</p>
+        </section>
+
+        <!-- Schedule: Pokémon Route timeline. Starts hidden; Transitions toggles `.hidden` when swapping sections. -->
+        <section id="schedule" data-gen="1" class="hidden min-h-screen px-4 pb-20 pt-28">
+            <div class="mx-auto max-w-5xl">
+                <h2 class="pokemon-title mb-3 text-center text-4xl sm:text-6xl">Schedule</h2>
+                <p
+                    class="mx-auto mb-12 max-w-xl text-center font-mono text-sm font-bold uppercase tracking-widest text-slate-900">
+                    Follow the route from Pallet Town to the Hall of Fame
+                </p>
+
+                <ol class="route font-mono">
+                    <!-- DAY 1 -->
+                    <li class="relative z-[2] mb-8 md:text-center" aria-hidden="true">
+                        <span
+                            class="inline-block border-4 border-[#1a1a40] bg-poke-yellow px-4 py-1.5 text-sm font-extrabold uppercase tracking-widest text-[#1a1a40] shadow-[4px_4px_0_0_#3b4cca]">Day
+                            1</span>
+                    </li>
+
+                    <li class="route__item relative mb-10" data-schedule-item data-side="left">
+                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
+                        <article
+                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-0 md:mr-auto md:w-[calc(50%-2.75rem)]"
+                            data-schedule-card>
+                            <p
+                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
+                                Day 1 &middot; 9:00 AM</p>
+                            <div class="p-4">
+                                <p
+                                    class="mb-2 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-widest text-white">
+                                    &#9654; Pallet Town</p>
+                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
+                                    Check-in &amp; Opening Ceremony</h3>
+                                <p class="mt-2 text-sm leading-relaxed text-slate-800">Check in at the desk, meet your
+                                    fellow trainers and hear the rules of the route at the opening ceremony. Every great
+                                    journey starts in Pallet Town.</p>
+                            </div>
+                        </article>
+                    </li>
+
+                    <li class="route__item relative mb-10" data-schedule-item data-side="right">
+                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
+                        <article
+                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-auto md:w-[calc(50%-2.75rem)]"
+                            data-schedule-card>
+                            <p
+                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
+                                Day 1 &middot; 11:00 AM</p>
+                            <div class="p-4">
+                                <p
+                                    class="mb-2 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-widest text-white">
+                                    &#9654; Into the Tall Grass</p>
+                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
+                                    Hacking Begins</h3>
+                                <p class="mt-2 text-sm leading-relaxed text-slate-800">The clock starts and the tall
+                                    grass rustles. Time to build, because wild bugs can appear at any moment.</p>
+                            </div>
+                        </article>
+                    </li>
+
+                    <li class="route__item relative mb-10" data-schedule-item data-side="left">
+                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
+                        <article
+                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-0 md:mr-auto md:w-[calc(50%-2.75rem)]"
+                            data-schedule-card>
+                            <p
+                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
+                                Day 1 &middot; 6:00 PM</p>
+                            <div class="p-4">
+                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
+                                    Mentor Check-in</h3>
+                                <p class="mt-2 text-sm leading-relaxed text-slate-800">Mentors visit teams to review
+                                    progress, answer questions and help you get past tough roadblocks.</p>
+                            </div>
+                        </article>
+                    </li>
+
+                    <li class="route__item relative mb-10" data-schedule-item data-side="right">
+                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
+                        <article
+                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-auto md:w-[calc(50%-2.75rem)]"
+                            data-schedule-card>
+                            <p
+                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
+                                Day 1 &middot; 11:59 PM</p>
+                            <div class="p-4">
+                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
+                                    Midnight Snacks &amp; Mini-games</h3>
+                                <p class="mt-2 text-sm leading-relaxed text-slate-800">Refuel with midnight snacks and
+                                    take a break with mini-games. Even the best trainers need a Potion now and then.</p>
+                            </div>
+                        </article>
+                    </li>
+
+                    <!-- DAY 2 -->
+                    <li class="relative z-[2] mb-8 md:text-center" aria-hidden="true">
+                        <span
+                            class="inline-block border-4 border-[#1a1a40] bg-poke-yellow px-4 py-1.5 text-sm font-extrabold uppercase tracking-widest text-[#1a1a40] shadow-[4px_4px_0_0_#3b4cca]">Day
+                            2</span>
+                    </li>
+
+                    <li class="route__item relative mb-10" data-schedule-item data-side="left">
+                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
+                        <article
+                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-0 md:mr-auto md:w-[calc(50%-2.75rem)]"
+                            data-schedule-card>
+                            <p
+                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
+                                Day 2 &middot; 11:00 AM</p>
+                            <div class="p-4">
+                                <p
+                                    class="mb-2 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-widest text-white">
+                                    &#9654; The Elite Four</p>
+                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
+                                    Hacking Ends &amp; Submissions</h3>
+                                <p class="mt-2 text-sm leading-relaxed text-slate-800">Pencils down! Submit your project
+                                    before the deadline, then get ready to face the judges.</p>
+                            </div>
+                        </article>
+                    </li>
+
+                    <li class="route__item relative mb-10" data-schedule-item data-side="right">
+                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
+                        <article
+                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-auto md:w-[calc(50%-2.75rem)]"
+                            data-schedule-card>
+                            <p
+                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
+                                Day 2 &middot; 2:00 PM</p>
+                            <div class="p-4">
+                                <p
+                                    class="mb-2 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-widest text-white">
+                                    &#9654; Hall of Fame</p>
+                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
+                                    Pitches &amp; Closing Ceremony</h3>
+                                <p class="mt-2 text-sm leading-relaxed text-slate-800">Pitch your project to the judges
+                                    and cheer on the finalists. The closing ceremony crowns the champions who enter the
+                                    Hall of Fame.</p>
+                            </div>
+                        </article>
+                    </li>
+
+                    <!-- Finish marker: gives the route line somewhere to end -->
+                    <li class="route__end" aria-hidden="true"></li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- 4. Prizes Section (Hidden by default) -->
+        <section id="prizes"
+            class="hidden flex min-h-screen flex-col items-center justify-center gap-4 px-4 pt-28 text-center">
+            <h1 class="pokemon-title text-5xl sm:text-7xl md:text-8xl">Prizes</h1>
+            <p class="font-mono text-xl text-slate-800">Win big with Pay Day!</p>
+        </section>
+
+        <!-- 5. Sponsors Section (Hidden by default) -->
+        <section id="sponsors"
+            class="hidden flex min-h-screen flex-col items-center justify-center gap-4 px-4 pt-28 text-center">
+            <h1 class="pokemon-title text-5xl sm:text-7xl md:text-8xl">Sponsors</h1>
+            <p class="font-mono text-xl text-slate-800">Backed by the best.</p>
+        </section>
+
+        <!-- 6. FAQs Section (Hidden by default) -->
+        <!-- FAQs: Kanto Pokédex. Starts hidden; Transitions toggles `.hidden` when swapping sections. -->
+        <section id="faqs" data-gen="1" class="hidden min-h-screen px-4 pb-16 pt-28">
+            <div class="mx-auto max-w-5xl">
+                <h2 class="pokemon-title mb-8 text-center text-4xl sm:text-6xl">Pokédex FAQ</h2>
+
+                <div class="pokedex" data-pokedex>
+                    <!-- Top bar: lens, status LEDs, stamped label -->
+                    <div class="pokedex__top mb-5 flex items-center gap-4 px-1 sm:gap-5">
+                        <div class="pokedex__lens" aria-hidden="true"></div>
+                        <div class="flex gap-2" aria-hidden="true">
+                            <span class="pokedex__led pokedex__led--red"></span>
+                            <span class="pokedex__led pokedex__led--yellow"></span>
+                            <span class="pokedex__led pokedex__led--green"></span>
+                        </div>
+                        <p class="pokedex__stamp ml-auto text-xs sm:text-sm">Kodekurrent Dex</p>
+                    </div>
+
+                    <div class="grid gap-5 md:grid-cols-[1.15fr_auto_1fr]">
+                        <!-- LEFT: main display (the Pokédex entry) -->
+                        <div class="pokedex__panel flex flex-col gap-4">
+                            <div class="pokedex__bezel">
+                                <div class="pokedex__screen pokedex__screen--main">
+                                    <div
+                                        class="mb-3 flex items-center justify-between gap-2 border-b-2 border-[#12331a]/50 pb-2 font-mono text-xs font-bold uppercase tracking-widest">
+                                        <span data-pokedex-number>No. ---</span>
+                                        <span aria-hidden="true">Data</span>
+                                    </div>
+
+                                    <h3 data-pokedex-title
+                                        class="mb-3 font-mono text-base font-bold uppercase leading-snug sm:text-lg">
+                                        Pokédex ready
+                                    </h3>
+
+                                    <!-- The ghost reserves the final height; the typed layer sits on top of it -->
+                                    <div class="pokedex__text relative font-mono">
+                                        <span data-pokedex-ghost aria-hidden="true" class="invisible block">Select a
+                                            question from the index to read its Pokédex entry.</span>
+                                        <span class="absolute inset-0 block" aria-hidden="true"><span
+                                                data-pokedex-typed>Select a question from the index to read its Pokédex
+                                                entry.</span><span class="pokedex__cursor"></span></span>
+                                    </div>
+
+                                    <!-- Screen readers get the whole entry at once instead of letter by letter -->
+                                    <p data-pokedex-sr class="sr-only" aria-live="polite"></p>
+                                </div>
+                            </div>
+
+                            <!-- Decorative controls -->
+                            <div class="flex items-center justify-between px-2" aria-hidden="true">
+                                <span class="pokedex__button pokedex__button--blue"></span>
+                                <span class="pokedex__speaker"></span>
+                                <span class="pokedex__button pokedex__button--green"></span>
+                            </div>
+                        </div>
+
+                        <!-- Hinge -->
+                        <div class="pokedex__hinge hidden md:block" aria-hidden="true"></div>
+
+                        <!-- RIGHT: question index -->
+                        <div class="pokedex__panel flex flex-col gap-4">
+                            <div class="pokedex__bezel">
+                                <div class="pokedex__screen pokedex__screen--list">
+                                    <p
+                                        class="mb-3 border-b-2 border-cyan-200/30 pb-2 font-mono text-xs font-bold uppercase tracking-widest text-cyan-200">
+                                        Index &middot; Select entry
+                                    </p>
+
+                                    <ul class="flex flex-col gap-3">
+                                        <li>
+                                            <button type="button" class="pokedex__q" data-faq data-entry="001"
+                                                data-answer="KODEKURRENT is the hackathon hosted by the IEEE Student Chapter at RGIPT. Trainers team up to build real projects, learn from mentors and show off their creations to the judges. A wild adventure for developers, designers and engineers alike.">
+                                                What is Kodekurrent?
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="pokedex__q" data-faq data-entry="002"
+                                                data-answer="Any student who loves to build things. Developers, designers and engineers are all welcome, and no prior hackathon experience is required. Every great trainer started with a single Pokémon.">
+                                                Who can participate?
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="pokedex__q" data-faq data-entry="003"
+                                                data-answer="Use the registration link on this site and fill in your details. Keep an eye on your inbox afterwards, because confirmations and updates are sent by email.">
+                                                How do I register?
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="pokedex__q" data-faq data-entry="004"
+                                                data-answer="Teams are encouraged, because the best trainers rely on their party. Team size limits and the rules for forming teams are listed on the registration page.">
+                                                Do I need a team?
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="pokedex__q" data-faq data-entry="005"
+                                                data-answer="Your laptop, charger and a fully charged brain. Venue and schedule details will be shared with registered teams, so check your messages before the event.">
+                                                What should I bring?
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Decorative D-pad + pills -->
+                            <div class="flex items-center justify-between px-2" aria-hidden="true">
+                                <span class="pokedex__dpad"></span>
+                                <span class="flex gap-3"><span class="pokedex__pill"></span><span
+                                        class="pokedex__pill"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team & Contact. Starts hidden; Transitions toggles `.hidden` when swapping sections. -->
+        <section id="contact" data-gen="1" class="hidden min-h-screen px-4 pb-24 pt-28">
+            <div class="mx-auto max-w-6xl">
+                <!-- ===================== TEAM MARQUEE ===================== -->
+                <h2 class="pokemon-title mb-3 text-center text-4xl sm:text-6xl">Meet the Team</h2>
+                <p
+                    class="mx-auto mb-4 max-w-xl text-center font-mono text-sm font-bold uppercase tracking-widest text-slate-900">
+                    The trainers behind Kodekurrent
+                </p>
+
+                <!-- JS clones the group below for a seamless loop; without JS this is a plain scrollable row -->
+                <div class="marquee" data-marquee role="region" aria-label="Team members">
+                    <div class="marquee__track" data-marquee-track>
+                        <ul class="marquee__group" data-marquee-group>
+
+                            <!-- To use a real photo, put <img class="tcg__photo" src="/team/member-01.webp" alt="Name" loading="lazy" />
+               inside .tcg__art; it covers the silhouette placeholder. -->
+
+                            <li class="flex-none">
+                                <article class="tcg tcg--lightning font-mono" tabindex="0"
+                                    aria-label="Team Member 01, Council Organizer">
+                                    <div class="tcg__frame">
+                                        <header class="tcg__head">
+                                            <span class="tcg__stage">Basic</span>
+                                            <h3 class="tcg__name">Team Member 01</h3>
+                                            <span class="tcg__hp"><small>HP</small>90<i
+                                                    class="tcg__type tcg__type--lightning"
+                                                    aria-hidden="true"></i></span>
+                                        </header>
+                                        <div class="tcg__art"></div>
+                                        <p class="tcg__dex">Council Pok&eacute;mon &middot; No. 001</p>
+                                        <ul class="tcg__attacks">
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--lightning"></i></span><span
+                                                    class="tcg__move">Council Organizer</span><span
+                                                    class="tcg__dmg">60</span></li>
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--lightning"></i><i
+                                                        class="tcg__type tcg__type--colorless"></i></span><span
+                                                    class="tcg__move">Team Coordination</span><span
+                                                    class="tcg__dmg">30+</span></li>
+                                        </ul>
+                                        <footer class="tcg__foot"><span>Weakness <i
+                                                    class="tcg__type tcg__type--fighting"
+                                                    aria-hidden="true"></i>&times;2</span><span>Retreat <i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span></footer>
+                                    </div>
+                                </article>
+                            </li>
+
+                            <li class="flex-none">
+                                <article class="tcg tcg--fire font-mono" tabindex="0"
+                                    aria-label="Team Member 02, Tinkering Lead">
+                                    <div class="tcg__frame">
+                                        <header class="tcg__head">
+                                            <span class="tcg__stage">Basic</span>
+                                            <h3 class="tcg__name">Team Member 02</h3>
+                                            <span class="tcg__hp"><small>HP</small>80<i
+                                                    class="tcg__type tcg__type--fire" aria-hidden="true"></i></span>
+                                        </header>
+                                        <div class="tcg__art"></div>
+                                        <p class="tcg__dex">Tinker Pok&eacute;mon &middot; No. 002</p>
+                                        <ul class="tcg__attacks">
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--fire"></i></span><span
+                                                    class="tcg__move">Tinkering Lead</span><span
+                                                    class="tcg__dmg">50</span></li>
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--fire"></i><i
+                                                        class="tcg__type tcg__type--fire"></i></span><span
+                                                    class="tcg__move">Hardware Hacking</span><span
+                                                    class="tcg__dmg">70</span></li>
+                                        </ul>
+                                        <footer class="tcg__foot"><span>Weakness <i class="tcg__type tcg__type--water"
+                                                    aria-hidden="true"></i>&times;2</span><span>Retreat <i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span></footer>
+                                    </div>
+                                </article>
+                            </li>
+
+                            <li class="flex-none">
+                                <article class="tcg tcg--water font-mono" tabindex="0"
+                                    aria-label="Team Member 03, Developer">
+                                    <div class="tcg__frame">
+                                        <header class="tcg__head">
+                                            <span class="tcg__stage">Basic</span>
+                                            <h3 class="tcg__name">Team Member 03</h3>
+                                            <span class="tcg__hp"><small>HP</small>70<i
+                                                    class="tcg__type tcg__type--water" aria-hidden="true"></i></span>
+                                        </header>
+                                        <div class="tcg__art"></div>
+                                        <p class="tcg__dex">Code Pok&eacute;mon &middot; No. 003</p>
+                                        <ul class="tcg__attacks">
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--water"></i></span><span
+                                                    class="tcg__move">Developer</span><span class="tcg__dmg">40</span>
+                                            </li>
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--water"></i><i
+                                                        class="tcg__type tcg__type--colorless"></i></span><span
+                                                    class="tcg__move">Web Wizardry</span><span
+                                                    class="tcg__dmg">60+</span></li>
+                                        </ul>
+                                        <footer class="tcg__foot"><span>Weakness <i class="tcg__type tcg__type--grass"
+                                                    aria-hidden="true"></i>&times;2</span><span>Retreat <i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span></footer>
+                                    </div>
+                                </article>
+                            </li>
+
+                            <li class="flex-none">
+                                <article class="tcg tcg--psychic font-mono" tabindex="0"
+                                    aria-label="Team Member 04, Design Lead">
+                                    <div class="tcg__frame">
+                                        <header class="tcg__head">
+                                            <span class="tcg__stage">Basic</span>
+                                            <h3 class="tcg__name">Team Member 04</h3>
+                                            <span class="tcg__hp"><small>HP</small>100<i
+                                                    class="tcg__type tcg__type--psychic" aria-hidden="true"></i></span>
+                                        </header>
+                                        <div class="tcg__art"></div>
+                                        <p class="tcg__dex">Design Pok&eacute;mon &middot; No. 004</p>
+                                        <ul class="tcg__attacks">
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--psychic"></i></span><span
+                                                    class="tcg__move">Design Lead</span><span class="tcg__dmg">50</span>
+                                            </li>
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--psychic"></i><i
+                                                        class="tcg__type tcg__type--colorless"></i></span><span
+                                                    class="tcg__move">Pixel Perfect</span><span
+                                                    class="tcg__dmg">30+</span></li>
+                                        </ul>
+                                        <footer class="tcg__foot"><span>Weakness <i class="tcg__type tcg__type--psychic"
+                                                    aria-hidden="true"></i>&times;2</span><span>Retreat <i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span></footer>
+                                    </div>
+                                </article>
+                            </li>
+
+                            <li class="flex-none">
+                                <article class="tcg tcg--grass font-mono" tabindex="0"
+                                    aria-label="Team Member 05, Content Lead">
+                                    <div class="tcg__frame">
+                                        <header class="tcg__head">
+                                            <span class="tcg__stage">Basic</span>
+                                            <h3 class="tcg__name">Team Member 05</h3>
+                                            <span class="tcg__hp"><small>HP</small>90<i
+                                                    class="tcg__type tcg__type--grass" aria-hidden="true"></i></span>
+                                        </header>
+                                        <div class="tcg__art"></div>
+                                        <p class="tcg__dex">Story Pok&eacute;mon &middot; No. 005</p>
+                                        <ul class="tcg__attacks">
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--grass"></i></span><span
+                                                    class="tcg__move">Content Lead</span><span
+                                                    class="tcg__dmg">40</span></li>
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--grass"></i><i
+                                                        class="tcg__type tcg__type--grass"></i></span><span
+                                                    class="tcg__move">Storytelling</span><span
+                                                    class="tcg__dmg">60</span></li>
+                                        </ul>
+                                        <footer class="tcg__foot"><span>Weakness <i class="tcg__type tcg__type--fire"
+                                                    aria-hidden="true"></i>&times;2</span><span>Retreat <i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span></footer>
+                                    </div>
+                                </article>
+                            </li>
+
+                            <li class="flex-none">
+                                <article class="tcg tcg--lightning font-mono" tabindex="0"
+                                    aria-label="Team Member 06, Outreach Lead">
+                                    <div class="tcg__frame">
+                                        <header class="tcg__head">
+                                            <span class="tcg__stage">Basic</span>
+                                            <h3 class="tcg__name">Team Member 06</h3>
+                                            <span class="tcg__hp"><small>HP</small>80<i
+                                                    class="tcg__type tcg__type--lightning"
+                                                    aria-hidden="true"></i></span>
+                                        </header>
+                                        <div class="tcg__art"></div>
+                                        <p class="tcg__dex">Buzz Pok&eacute;mon &middot; No. 006</p>
+                                        <ul class="tcg__attacks">
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--lightning"></i></span><span
+                                                    class="tcg__move">Outreach Lead</span><span
+                                                    class="tcg__dmg">30</span></li>
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--lightning"></i><i
+                                                        class="tcg__type tcg__type--colorless"></i></span><span
+                                                    class="tcg__move">Social Buzz</span><span
+                                                    class="tcg__dmg">50+</span></li>
+                                        </ul>
+                                        <footer class="tcg__foot"><span>Weakness <i
+                                                    class="tcg__type tcg__type--fighting"
+                                                    aria-hidden="true"></i>&times;2</span><span>Retreat <i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span></footer>
+                                    </div>
+                                </article>
+                            </li>
+
+                            <li class="flex-none">
+                                <article class="tcg tcg--fighting font-mono" tabindex="0"
+                                    aria-label="Team Member 07, Logistics Lead">
+                                    <div class="tcg__frame">
+                                        <header class="tcg__head">
+                                            <span class="tcg__stage">Basic</span>
+                                            <h3 class="tcg__name">Team Member 07</h3>
+                                            <span class="tcg__hp"><small>HP</small>110<i
+                                                    class="tcg__type tcg__type--fighting" aria-hidden="true"></i></span>
+                                        </header>
+                                        <div class="tcg__art"></div>
+                                        <p class="tcg__dex">Haul Pok&eacute;mon &middot; No. 007</p>
+                                        <ul class="tcg__attacks">
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--fighting"></i></span><span
+                                                    class="tcg__move">Logistics Lead</span><span
+                                                    class="tcg__dmg">60</span></li>
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--fighting"></i><i
+                                                        class="tcg__type tcg__type--colorless"></i></span><span
+                                                    class="tcg__move">Supply Run</span><span class="tcg__dmg">20+</span>
+                                            </li>
+                                        </ul>
+                                        <footer class="tcg__foot"><span>Weakness <i class="tcg__type tcg__type--psychic"
+                                                    aria-hidden="true"></i>&times;2</span><span>Retreat <i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span></footer>
+                                    </div>
+                                </article>
+                            </li>
+
+                            <li class="flex-none">
+                                <article class="tcg tcg--colorless font-mono" tabindex="0"
+                                    aria-label="Team Member 08, Sponsorship Lead">
+                                    <div class="tcg__frame">
+                                        <header class="tcg__head">
+                                            <span class="tcg__stage">Basic</span>
+                                            <h3 class="tcg__name">Team Member 08</h3>
+                                            <span class="tcg__hp"><small>HP</small>100<i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span>
+                                        </header>
+                                        <div class="tcg__art"></div>
+                                        <p class="tcg__dex">Deal Pok&eacute;mon &middot; No. 008</p>
+                                        <ul class="tcg__attacks">
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--colorless"></i></span><span
+                                                    class="tcg__move">Sponsorship Lead</span><span
+                                                    class="tcg__dmg">40</span></li>
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--colorless"></i><i
+                                                        class="tcg__type tcg__type--colorless"></i></span><span
+                                                    class="tcg__move">Deal Maker</span><span class="tcg__dmg">50+</span>
+                                            </li>
+                                        </ul>
+                                        <footer class="tcg__foot"><span>Weakness <i
+                                                    class="tcg__type tcg__type--fighting"
+                                                    aria-hidden="true"></i>&times;2</span><span>Retreat <i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span></footer>
+                                    </div>
+                                </article>
+                            </li>
+
+                            <li class="flex-none">
+                                <article class="tcg tcg--water font-mono" tabindex="0"
+                                    aria-label="Team Member 09, Developer">
+                                    <div class="tcg__frame">
+                                        <header class="tcg__head">
+                                            <span class="tcg__stage">Basic</span>
+                                            <h3 class="tcg__name">Team Member 09</h3>
+                                            <span class="tcg__hp"><small>HP</small>70<i
+                                                    class="tcg__type tcg__type--water" aria-hidden="true"></i></span>
+                                        </header>
+                                        <div class="tcg__art"></div>
+                                        <p class="tcg__dex">Debug Pok&eacute;mon &middot; No. 009</p>
+                                        <ul class="tcg__attacks">
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--water"></i></span><span
+                                                    class="tcg__move">Developer</span><span class="tcg__dmg">40</span>
+                                            </li>
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--water"></i><i
+                                                        class="tcg__type tcg__type--water"></i></span><span
+                                                    class="tcg__move">Bug Squash</span><span class="tcg__dmg">70</span>
+                                            </li>
+                                        </ul>
+                                        <footer class="tcg__foot"><span>Weakness <i class="tcg__type tcg__type--grass"
+                                                    aria-hidden="true"></i>&times;2</span><span>Retreat <i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span></footer>
+                                    </div>
+                                </article>
+                            </li>
+
+                            <li class="flex-none">
+                                <article class="tcg tcg--psychic font-mono" tabindex="0"
+                                    aria-label="Team Member 10, Media Lead">
+                                    <div class="tcg__frame">
+                                        <header class="tcg__head">
+                                            <span class="tcg__stage">Basic</span>
+                                            <h3 class="tcg__name">Team Member 10</h3>
+                                            <span class="tcg__hp"><small>HP</small>90<i
+                                                    class="tcg__type tcg__type--psychic" aria-hidden="true"></i></span>
+                                        </header>
+                                        <div class="tcg__art"></div>
+                                        <p class="tcg__dex">Snap Pok&eacute;mon &middot; No. 010</p>
+                                        <ul class="tcg__attacks">
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--psychic"></i></span><span
+                                                    class="tcg__move">Media Lead</span><span class="tcg__dmg">30</span>
+                                            </li>
+                                            <li class="tcg__attack"><span class="tcg__cost" aria-hidden="true"><i
+                                                        class="tcg__type tcg__type--psychic"></i><i
+                                                        class="tcg__type tcg__type--colorless"></i></span><span
+                                                    class="tcg__move">Snap Shot</span><span class="tcg__dmg">60</span>
+                                            </li>
+                                        </ul>
+                                        <footer class="tcg__foot"><span>Weakness <i class="tcg__type tcg__type--psychic"
+                                                    aria-hidden="true"></i>&times;2</span><span>Retreat <i
+                                                    class="tcg__type tcg__type--colorless"
+                                                    aria-hidden="true"></i></span></footer>
+                                    </div>
+                                </article>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="mt-1 text-center font-mono text-xs font-bold uppercase tracking-widest text-slate-900/80">
+                    Hover or focus a card to pause
+                </p>
+
+                <!-- ===================== CONTACT FORM (Bill's PC) ===================== -->
+                <div class="mx-auto mt-24 max-w-3xl">
+                    <h2 class="pokemon-title mb-3 text-center text-4xl sm:text-6xl">Contact Us</h2>
+                    <p
+                        class="mx-auto mb-10 max-w-xl text-center font-mono text-sm font-bold uppercase tracking-widest text-slate-900">
+                        Send a message through Bill&rsquo;s PC
+                    </p>
+
+                    <form class="pc" data-contact-form>
+                        <div class="pc__screen">
+                            <div class="pc__bar mb-4 flex items-center justify-between gap-3">
+                                <span>Bill&rsquo;s PC</span>
+                                <span>Box 1 &middot; Contact</span>
+                            </div>
+
+                            <div class="pc__window flex flex-col gap-5">
+                                <label class="pc__field flex flex-col gap-2">
+                                    <span class="pc__label">Trainer name</span>
+                                    <input class="pc__input" type="text" name="name" required maxlength="60"
+                                        autocomplete="name" placeholder="ASH K." />
+                                </label>
+
+                                <label class="pc__field flex flex-col gap-2">
+                                    <span class="pc__label">Email</span>
+                                    <input class="pc__input" type="email" name="email" required maxlength="120"
+                                        autocomplete="email" placeholder="ash@pallet.town" />
+                                </label>
+
+                                <label class="pc__field flex flex-col gap-2">
+                                    <span class="pc__label">Message</span>
+                                    <textarea class="pc__input resize-y" name="message" rows="5" required
+                                        maxlength="1000" placeholder="TYPE YOUR MESSAGE HERE..."></textarea>
+                                </label>
+
+                                <!-- Battle-menu style actions -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <button type="submit" class="pc__btn pc__btn--primary"
+                                        data-contact-submit>Send</button>
+                                    <button type="reset" class="pc__btn">Clear</button>
+                                </div>
+
+                                <p class="pc__status" data-contact-status role="status" aria-live="polite"></p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <!-- Professor Oak widget. z-200: above the nav (100), below the intro (500), transition overlay (999) and loader (9999) -->
+    <!-- Professor Oak widget. z-200: above the nav (100), below the intro (500), transition overlay (999) and loader (9999) -->
+    <aside id="oak-chat" data-oak-chat aria-label="Professor Oak helper"
+        class="oak-chat fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))] z-[200]">
+        <!-- Expanded: classic dialogue box, popping up above the standing avatar -->
+        <div id="oak-dialog" data-oak-box role="region" aria-label="Professor Oak says"
+            class="oak-box hidden absolute bottom-full right-0 mb-4 w-[min(22rem,calc(100vw-2rem))]">
+            <span class="oak-box__name">Prof. Oak</span>
+            <button type="button" data-oak-close class="oak-box__close"
+                aria-label="Close Professor Oak">&#10005;</button>
+
+            <!-- The ghost holds the full message (single source of truth) and reserves its height;
+         the typed layer sits on top of it -->
+            <div class="relative pb-5 pt-1 font-mono text-[0.95rem] font-bold leading-relaxed">
+                <span data-oak-ghost aria-hidden="true" class="invisible block">Hello there! Welcome to the world of
+                    Kodekurrent! My name is Oak. People call me the RGIPT Hackathon Professor. Are you here to code, or
+                    are you here to design?</span>
+                <span class="absolute inset-0 block" aria-hidden="true"><span data-oak-typed></span><span
+                        class="oak-cursor"></span></span>
+            </div>
+
+            <span class="oak-box__next" aria-hidden="true">&#9660;</span>
+        </div>
+
+        <!-- Screen readers get the full message at once; kept outside the box so it's always rendered -->
+        <p data-oak-sr class="sr-only" aria-live="polite"></p>
+
+        <!-- Collapsed: the full standing character, shown as-is -->
+        <button type="button" data-oak-toggle class="oak-avatar" aria-expanded="false" aria-controls="oak-dialog"
+            aria-label="Talk to Professor Oak">
+            <img src="/pokemon/prof-oak.png" alt="" width="140" height="200" draggable="false"
+                class="block h-[160px] w-[112px] object-contain object-bottom sm:h-[200px] sm:w-[140px]" />
+            <span class="oak-badge" data-oak-badge aria-hidden="true">!</span>
+        </button>
+    </aside>
+
+    <script type="module" src="/js/main.js"></script>
+</body>
+
+</html>

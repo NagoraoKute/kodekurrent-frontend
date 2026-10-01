@@ -1,0 +1,161 @@
+/* Uses the individual `rotate` / `translate` properties so these never fight
+   with the `transform` set on .nav-ball for the active state. */
+@keyframes ball-wiggle {
+
+    0%,
+    100% {
+        rotate: 0deg;
+    }
+
+    20% {
+        rotate: -22deg;
+    }
+
+    40% {
+        rotate: 18deg;
+    }
+
+    60% {
+        rotate: -12deg;
+    }
+
+    80% {
+        rotate: 8deg;
+    }
+}
+
+@keyframes ball-bob {
+
+    0%,
+    100% {
+        translate: 0 0;
+    }
+
+    50% {
+        translate: 0 -0.2rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .nav-ball,
+    .nav-tab.is-active .nav-ball {
+        animation: none !important;
+    }
+}
+
+@keyframes pokedex-lens-pulse {
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.18);
+    }
+}
+
+@keyframes pokedex-blink {
+
+    /* typing cursor */
+    0%,
+    49% {
+        opacity: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes pokedex-led {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.35;
+    }
+}
+
+@keyframes pokedex-arrow {
+
+    0%,
+    49% {
+        transform: translate(0, -50%);
+    }
+
+    50%,
+    100% {
+        transform: translate(3px, -50%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .pokedex__lens,
+    .pokedex__cursor,
+    .pokedex__led,
+    .pokedex__q::before {
+        animation: none !important;
+    }
+}
+
+@keyframes oak-bounce {
+
+    0%,
+    100% {
+        translate: 0 0;
+    }
+
+    50% {
+        translate: 0 -0.45rem;
+    }
+}
+
+@keyframes oak-badge-pulse {
+
+    0%,
+    100% {
+        scale: 1;
+    }
+
+    50% {
+        scale: 1.2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .oak-avatar,
+    .oak-badge,
+    .oak-box__next {
+        animation: none !important;
+    }
+}
+
+@keyframes team-marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+
+    /* exactly one copy of the cards */
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .marquee.is-running .marquee__track {
+        animation: none;
+    }
+
+    .pc__label::before,
+    .pc__btn::before,
+    .pc__status::after {
+        animation: none !important;
+    }
+}
