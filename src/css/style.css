@@ -672,126 +672,204 @@
 }
 
 /* ==========================================================================
-   Schedule: Pokémon Route timeline
-   Layout lives in Tailwind (HTML); this is the route line, connectors, Pokéball nodes and finish star.
+   Schedule: Kanto map
    ========================================================================== */
-.route {
-    --route-x: 1rem;
-    /* x of the route line (mobile: left-aligned) */
-    --route-link: 2.25rem;
-    /* connector length: line centre -> card edge */
-    position: relative;
+
+/* The real map. 100% 100% stretches it over the container, so a town's --x/--y (in %)
+   always lands on the same spot of the picture, whatever the screen's shape.
+   (bg-green-400 in the HTML is only the colour shown while the image loads.) */
+.map {
+    background-image: url('/public/images/kanto-map.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-@media (min-width: 768px) {
-    .route {
-        --route-x: 50%;
-        /* desktop: centred */
-        --route-link: 2.75rem;
-    }
+/* ---------- Towns ----------
+   A town is a zero-size anchor at (--x%, --y%): the ring marker is centred on it. */
+.town {
+    position: absolute;
+    z-index: 10;
+    left: calc(var(--x) * 1%);
+    top: calc(var(--y) * 1%);
+    width: 0;
+    height: 0;
 }
 
-/* Thick dashed route: yellow dashes with a navy outline (drop-shadow follows the dash shapes) */
-.route::before {
-    content: '';
+/* Ring "pointer" around the map's own red dot. Sized in vw, like the map, so it keeps hugging the dot. */
+.town__pin {
+    --pin: clamp(1.5rem, 4.6vw, 3.6rem);
     position: absolute;
     top: 0;
-    bottom: 0;
-    left: var(--route-x);
-    width: 8px;
-    margin-left: -4px;
-    background: repeating-linear-gradient(to bottom, #ffcb05 0 16px, transparent 16px 30px);
-    filter:
-        drop-shadow(3px 0 0 #1a1a40) drop-shadow(-3px 0 0 #1a1a40) drop-shadow(0 3px 0 #1a1a40) drop-shadow(0 -3px 0 #1a1a40);
-}
-
-/* Connector from each card to the route (aligned with the time strip, which is 1.8rem tall) */
-.route__card::after {
-    content: '';
-    position: absolute;
-    top: calc(0.9rem - 3px);
-    right: 100%;
-    width: var(--route-link);
-    height: 6px;
-    background: #1a1a40;
-}
-
-@media (min-width: 768px) {
-
-    /* Left-hand cards connect on their right side */
-    .route__item[data-side='left'] .route__card::after {
-        right: auto;
-        left: 100%;
-    }
-}
-
-/* ---------- Pokéball node ----------
-   Centred with margin (not transform) so GSAP's transform animations can't displace it. */
-.route__node {
-    position: absolute;
-    top: 0.15rem;
-    left: var(--route-x);
-    z-index: 2;
-    width: 2rem;
-    height: 2rem;
-    margin-left: -1rem;
+    left: 0;
+    width: var(--pin);
+    height: var(--pin);
+    translate: -50% -50%;
+    /* centred on the town's point (individual property, so it can't clash with GSAP) */
     border: 3px solid #1a1a40;
     border-radius: 50%;
-    background:
-        radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.9) 0 5%, rgba(255, 255, 255, 0) 26%),
-        /* highlight */
-        radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.35) 100%),
-        /* shading */
-        linear-gradient(to bottom, #e8252b 0 42%, #1a1a40 42% 58%, #f7f7f7 58% 100%);
-    /* red / band / white */
-    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+    box-shadow: 0 0 0 2px #fff, inset 0 0 0 2px #fff;
+    transition: border-color 0.3s ease;
 }
 
-.route__node::before {
-    /* centre button */
+.town__pin::before {
+    /* the stop number you marked on the map */
+    content: attr(data-n);
+    position: absolute;
+    top: -0.7rem;
+    right: -0.7rem;
+    display: grid;
+    place-items: center;
+    width: 1.3rem;
+    height: 1.3rem;
+    font: 800 0.7rem/1 ui-monospace, 'Courier New', monospace;
+    color: #fff;
+    background: #1a1a40;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+.town__pin::after {
+    /* sonar ping while Ash stands here */
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 40%;
-    height: 40%;
-    transform: translate(-50%, -50%);
-    border: 2px solid #1a1a40;
+    inset: -3px;
+    border: 3px solid #ffcb05;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #fff 0 25%, #e6e6e6 60%, #bdbdbd 100%);
+    opacity: 0;
 }
 
-/* Hovering a card wiggles its ball (keyframes live in animations.css) */
-.route__item:hover .route__node {
-    animation: ball-wiggle 0.6s ease-in-out;
+.town.is-visited .town__pin {
+    border-color: #ffcb05;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .route__item:hover .route__node {
-        animation: none;
-    }
+/* turns gold once Ash has reached it */
+.town.is-active .town__pin::after {
+    animation: town-ping 1.2s ease-out infinite;
 }
 
-/* ---------- Finish star ---------- */
-.route__end {
-    position: relative;
-    z-index: 2;
-    height: 2.75rem;
-    /* The outline sits on this wrapper because clip-path would cut it off on the star itself */
-    filter:
-        drop-shadow(3px 0 0 #1a1a40) drop-shadow(-3px 0 0 #1a1a40) drop-shadow(0 3px 0 #1a1a40) drop-shadow(0 -3px 0 #1a1a40);
+/* Event card: invisible while Ash walks; Schedule.js pops it in while he stands in this town.
+   It is hidden with opacity (not visibility/display) so screen readers can still read every event. */
+.town__card {
+    position: absolute;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    background: #fffbe8;
+    border: 4px solid #1a1a40;
+    box-shadow: 4px 4px 0 #1a1a40;
 }
 
-.route__end::before {
-    content: '';
+/* Placement. The individual `translate` property is used (not `transform`) so it can't clash with GSAP's transform. */
+.town[data-card='beside-start'] .town__card {
+    top: 0;
+    left: 1.8rem;
+    translate: 0 -50%;
+    transform-origin: 0 50%;
+}
+
+.town[data-card='beside-end'] .town__card {
+    top: 0;
+    right: 1.8rem;
+    translate: 0 -50%;
+    transform-origin: 100% 50%;
+}
+
+.town[data-card='below-center'] .town__card {
+    top: 1.7rem;
+    left: 0;
+    translate: -50% 0;
+    transform-origin: 50% 0;
+}
+
+.town[data-card='above-center'] .town__card {
+    bottom: 4.9rem;
+    left: 0;
+    translate: -50% 0;
+    transform-origin: 50% 100%;
+}
+
+/* clears Ash's head */
+
+/* ---------- Ash: sprite sheet ----------
+   Sheet = 12 columns x 2 rows of equal frames; row 1 holds the walk cycles, 3 frames each:
+   down (cols 1-3), left (4-6), up (7-9), right (10-12).
+   Everything is in whole pixels so no frame edge can land between two device pixels. If you
+   change --frame-w, update the offsets below and the keyframes in animations.css (multiples of --frame-w). */
+#ash-sprite {
+    --frame-w: 48px;
+    /* w-12 */
+    --frame-h: 64px;
+    /* h-16 */
     position: absolute;
     top: 0;
-    left: var(--route-x);
-    width: 2.75rem;
-    height: 2.75rem;
-    margin-left: -1.375rem;
-    background: linear-gradient(160deg, #fff3a0, #ffcb05 55%, #e0a800);
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    left: 0;
+    z-index: 20;
+    width: var(--frame-w);
+    height: var(--frame-h);
+    pointer-events: none;
+    will-change: transform;
+    background-image: url('/pokemon/ash-walking.png');
+    background-repeat: no-repeat;
+    background-size: calc(var(--frame-w) * 12) auto;
+    /* 576px wide; the height follows the sheet's own aspect */
+    background-position: 0 0;
+    /* row 1 */
+    image-rendering: pixelated;
+}
+
+#ash-sprite:not(.is-ready) {
+    visibility: hidden;
+}
+
+/* until Schedule.js has put him on the map */
+
+/* Standing frame = the first frame of the direction he faces */
+#ash-sprite.facing-down {
+    background-position-x: 0;
+}
+
+#ash-sprite.facing-left {
+    background-position-x: -144px;
+}
+
+/* 3 frames x 48px */
+#ash-sprite.facing-up {
+    background-position-x: -288px;
+}
+
+/* 6 frames x 48px */
+#ash-sprite.facing-right {
+    background-position-x: -432px;
+}
+
+/* 9 frames x 48px */
+
+/* Walk cycle: 3 steps across that direction's 3 frames */
+#ash-sprite.is-walking {
+    animation: ash-walk-down 0.5s steps(3) infinite;
+}
+
+#ash-sprite.is-walking.facing-left {
+    animation-name: ash-walk-left;
+}
+
+#ash-sprite.is-walking.facing-up {
+    animation-name: ash-walk-up;
+}
+
+#ash-sprite.is-walking.facing-right {
+    animation-name: ash-walk-right;
+}
+
+/* ---------- Scroll hint ---------- */
+.map__hint {
+    transition: opacity 0.3s ease;
+    animation: map-hint-bob 1.2s ease-in-out infinite;
+}
+
+.map__hint.is-hidden {
+    opacity: 0;
 }
 
 /* ==========================================================================

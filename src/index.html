@@ -119,149 +119,164 @@
             <p class="font-mono text-xl text-slate-800">Learn about the hackathon.</p>
         </section>
 
-        <!-- Schedule: Pokémon Route timeline. Starts hidden; Transitions toggles `.hidden` when swapping sections. -->
-        <section id="schedule" data-gen="1" class="hidden min-h-screen px-4 pb-20 pt-28">
-            <div class="mx-auto max-w-5xl">
-                <h2 class="pokemon-title mb-3 text-center text-4xl sm:text-6xl">Schedule</h2>
-                <p
-                    class="mx-auto mb-12 max-w-xl text-center font-mono text-sm font-bold uppercase tracking-widest text-slate-900">
-                    Follow the route from Pallet Town to the Hall of Fame
-                </p>
+        <!-- Schedule: top-down Pokémon ROM map on the real Kanto map. Starts hidden; Transitions toggles `.hidden`. -->
+        <section id="schedule" data-gen="1" class="hidden">
+            <h2 class="sr-only">Schedule</h2>
 
-                <ol class="route font-mono">
-                    <!-- DAY 1 -->
-                    <li class="relative z-[2] mb-8 md:text-center" aria-hidden="true">
-                        <span
-                            class="inline-block border-4 border-[#1a1a40] bg-poke-yellow px-4 py-1.5 text-sm font-extrabold uppercase tracking-widest text-[#1a1a40] shadow-[4px_4px_0_0_#3b4cca]">Day
-                            1</span>
-                    </li>
+            <!-- 7 stops and a long walk, so this track is taller than before (more scroll per stop) -->
+            <div class="relative min-h-[1350vh]" data-schedule-track>
 
-                    <li class="route__item relative mb-10" data-schedule-item data-side="left">
-                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
-                        <article
-                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-0 md:mr-auto md:w-[calc(50%-2.75rem)]"
-                            data-schedule-card>
-                            <p
-                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
-                                Day 1 &middot; 9:00 AM</p>
-                            <div class="p-4">
+                <<div class="map sticky top-0 h-screen w-full overflow-hidden bg-green-400"
+                    style="background-image: url('/images/kanto-map.png');" data-schedule-map>
+
+                    <!-- Towns = event cards, in walking order (the numbers you marked on the map).
+           --x / --y   = the red dot, in % of the map image.
+           data-via    = road corners Ash passes on the way TO this town, so he stays on the yellow-brown path.
+           data-card   = where the card pops up: beside-start (right of the dot), beside-end (left),
+                         below-center, above-center. -->
+                    <ol class="absolute inset-0 z-10 m-0 list-none p-0 font-mono">
+
+                        <!-- 1 -->
+                        <li class="town" data-town data-card="beside-start" style="--x:22.8;--y:75">
+                            <span class="town__pin" data-n="1" aria-hidden="true"></span>
+                            <article class="town__card w-[13.5rem] md:w-80">
                                 <p
-                                    class="mb-2 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-widest text-white">
-                                    &#9654; Pallet Town</p>
-                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
-                                    Check-in &amp; Opening Ceremony</h3>
-                                <p class="mt-2 text-sm leading-relaxed text-slate-800">Check in at the desk, meet your
-                                    fellow trainers and hear the rules of the route at the opening ceremony. Every great
-                                    journey starts in Pallet Town.</p>
-                            </div>
-                        </article>
-                    </li>
+                                    class="block bg-poke-blue px-2 py-1.5 text-[0.65rem] font-bold uppercase leading-none tracking-widest text-poke-yellow md:text-xs">
+                                    Day 1 &middot; 9:00 AM</p>
+                                <div class="px-2 pb-2 pt-2">
+                                    <p
+                                        class="mb-1.5 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-widest text-white">
+                                        &#9654; Pallet Town</p>
+                                    <h3 class="text-xs font-extrabold uppercase leading-snug text-[#1a1a40] md:text-sm">
+                                        Check-in &amp; Opening Ceremony</h3>
+                                    <p class="mt-1.5 text-[0.7rem] leading-relaxed text-slate-800 md:text-xs">Check in
+                                        at the desk, meet your fellow trainers and hear the rules of the route. Every
+                                        great journey starts in Pallet Town.</p>
+                                </div>
+                            </article>
+                        </li>
 
-                    <li class="route__item relative mb-10" data-schedule-item data-side="right">
-                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
-                        <article
-                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-auto md:w-[calc(50%-2.75rem)]"
-                            data-schedule-card>
-                            <p
-                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
-                                Day 1 &middot; 11:00 AM</p>
-                            <div class="p-4">
+                        <!-- 2 -->
+                        <li class="town" data-town data-card="beside-start" style="--x:22.8;--y:58.2">
+                            <span class="town__pin" data-n="2" aria-hidden="true"></span>
+                            <article class="town__card w-[13.5rem] md:w-80">
                                 <p
-                                    class="mb-2 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-widest text-white">
-                                    &#9654; Into the Tall Grass</p>
-                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
-                                    Hacking Begins</h3>
-                                <p class="mt-2 text-sm leading-relaxed text-slate-800">The clock starts and the tall
-                                    grass rustles. Time to build, because wild bugs can appear at any moment.</p>
-                            </div>
-                        </article>
-                    </li>
+                                    class="block bg-poke-blue px-2 py-1.5 text-[0.65rem] font-bold uppercase leading-none tracking-widest text-poke-yellow md:text-xs">
+                                    Day 1 &middot; 11:00 AM</p>
+                                <div class="px-2 pb-2 pt-2">
+                                    <p
+                                        class="mb-1.5 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-widest text-white">
+                                        &#9654; Into the Tall Grass</p>
+                                    <h3 class="text-xs font-extrabold uppercase leading-snug text-[#1a1a40] md:text-sm">
+                                        Hacking Begins</h3>
+                                    <p class="mt-1.5 text-[0.7rem] leading-relaxed text-slate-800 md:text-xs">The clock
+                                        starts and the tall grass rustles. Time to build, because wild bugs can appear
+                                        at any moment.</p>
+                                </div>
+                            </article>
+                        </li>
 
-                    <li class="route__item relative mb-10" data-schedule-item data-side="left">
-                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
-                        <article
-                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-0 md:mr-auto md:w-[calc(50%-2.75rem)]"
-                            data-schedule-card>
-                            <p
-                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
-                                Day 1 &middot; 6:00 PM</p>
-                            <div class="p-4">
-                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
-                                    Mentor Check-in</h3>
-                                <p class="mt-2 text-sm leading-relaxed text-slate-800">Mentors visit teams to review
-                                    progress, answer questions and help you get past tough roadblocks.</p>
-                            </div>
-                        </article>
-                    </li>
-
-                    <li class="route__item relative mb-10" data-schedule-item data-side="right">
-                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
-                        <article
-                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-auto md:w-[calc(50%-2.75rem)]"
-                            data-schedule-card>
-                            <p
-                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
-                                Day 1 &middot; 11:59 PM</p>
-                            <div class="p-4">
-                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
-                                    Midnight Snacks &amp; Mini-games</h3>
-                                <p class="mt-2 text-sm leading-relaxed text-slate-800">Refuel with midnight snacks and
-                                    take a break with mini-games. Even the best trainers need a Potion now and then.</p>
-                            </div>
-                        </article>
-                    </li>
-
-                    <!-- DAY 2 -->
-                    <li class="relative z-[2] mb-8 md:text-center" aria-hidden="true">
-                        <span
-                            class="inline-block border-4 border-[#1a1a40] bg-poke-yellow px-4 py-1.5 text-sm font-extrabold uppercase tracking-widest text-[#1a1a40] shadow-[4px_4px_0_0_#3b4cca]">Day
-                            2</span>
-                    </li>
-
-                    <li class="route__item relative mb-10" data-schedule-item data-side="left">
-                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
-                        <article
-                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-0 md:mr-auto md:w-[calc(50%-2.75rem)]"
-                            data-schedule-card>
-                            <p
-                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
-                                Day 2 &middot; 11:00 AM</p>
-                            <div class="p-4">
+                        <!-- 3 -->
+                        <li class="town" data-town data-card="beside-start" style="--x:22.8;--y:35.8">
+                            <span class="town__pin" data-n="3" aria-hidden="true"></span>
+                            <article class="town__card w-[13.5rem] md:w-80">
                                 <p
-                                    class="mb-2 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-widest text-white">
-                                    &#9654; The Elite Four</p>
-                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
-                                    Hacking Ends &amp; Submissions</h3>
-                                <p class="mt-2 text-sm leading-relaxed text-slate-800">Pencils down! Submit your project
-                                    before the deadline, then get ready to face the judges.</p>
-                            </div>
-                        </article>
-                    </li>
+                                    class="block bg-poke-blue px-2 py-1.5 text-[0.65rem] font-bold uppercase leading-none tracking-widest text-poke-yellow md:text-xs">
+                                    Day 1 &middot; 6:00 PM</p>
+                                <div class="px-2 pb-2 pt-2">
+                                    <h3 class="text-xs font-extrabold uppercase leading-snug text-[#1a1a40] md:text-sm">
+                                        Mentor Check-in</h3>
+                                    <p class="mt-1.5 text-[0.7rem] leading-relaxed text-slate-800 md:text-xs">Mentors
+                                        visit teams to review progress, answer questions and help you get past tough
+                                        roadblocks.</p>
+                                </div>
+                            </article>
+                        </li>
 
-                    <li class="route__item relative mb-10" data-schedule-item data-side="right">
-                        <span class="route__node" data-schedule-node aria-hidden="true"></span>
-                        <article
-                            class="route__card relative ml-[3.25rem] border-4 border-[#1a1a40] bg-[#fffbe8] shadow-[6px_6px_0_0_#1a1a40] md:ml-auto md:w-[calc(50%-2.75rem)]"
-                            data-schedule-card>
-                            <p
-                                class="block bg-poke-blue px-3 py-[0.35rem] text-xs font-bold uppercase leading-[1.1rem] tracking-widest text-poke-yellow">
-                                Day 2 &middot; 2:00 PM</p>
-                            <div class="p-4">
+                        <!-- 4: the road bends up and across the top (from 3: right, up, right) -->
+                        <li class="town" data-town data-card="beside-end" style="--x:64.6;--y:30"
+                            data-via="39.7,35.8 39.7,30">
+                            <span class="town__pin" data-n="4" aria-hidden="true"></span>
+                            <article class="town__card w-[13.5rem] md:w-80">
                                 <p
-                                    class="mb-2 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-widest text-white">
-                                    &#9654; Hall of Fame</p>
-                                <h3 class="text-base font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-lg">
-                                    Pitches &amp; Closing Ceremony</h3>
-                                <p class="mt-2 text-sm leading-relaxed text-slate-800">Pitch your project to the judges
-                                    and cheer on the finalists. The closing ceremony crowns the champions who enter the
-                                    Hall of Fame.</p>
-                            </div>
-                        </article>
-                    </li>
+                                    class="block bg-poke-blue px-2 py-1.5 text-[0.65rem] font-bold uppercase leading-none tracking-widest text-poke-yellow md:text-xs">
+                                    Day 1 &middot; 11:59 PM</p>
+                                <div class="px-2 pb-2 pt-2">
+                                    <h3 class="text-xs font-extrabold uppercase leading-snug text-[#1a1a40] md:text-sm">
+                                        Midnight Snacks &amp; Mini-games</h3>
+                                    <p class="mt-1.5 text-[0.7rem] leading-relaxed text-slate-800 md:text-xs">Refuel
+                                        with midnight snacks and take a break with mini-games. Even the best trainers
+                                        need a Potion now and then.</p>
+                                </div>
+                            </article>
+                        </li>
 
-                    <!-- Finish marker: gives the route line somewhere to end -->
-                    <li class="route__end" aria-hidden="true"></li>
-                </ol>
+                        <!-- 5 -->
+                        <li class="town" data-town data-card="beside-end" style="--x:64.6;--y:46.9">
+                            <span class="town__pin" data-n="5" aria-hidden="true"></span>
+                            <article class="town__card w-[13.5rem] md:w-80">
+                                <p
+                                    class="block bg-poke-blue px-2 py-1.5 text-[0.65rem] font-bold uppercase leading-none tracking-widest text-poke-yellow md:text-xs">
+                                    Day 2 &middot; 11:00 AM</p>
+                                <div class="px-2 pb-2 pt-2">
+                                    <p
+                                        class="mb-1.5 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-widest text-white">
+                                        &#9654; The Elite Four</p>
+                                    <h3 class="text-xs font-extrabold uppercase leading-snug text-[#1a1a40] md:text-sm">
+                                        Hacking Ends &amp; Submissions</h3>
+                                    <p class="mt-1.5 text-[0.7rem] leading-relaxed text-slate-800 md:text-xs">Pencils
+                                        down! Submit your project before the deadline, then get ready to face the
+                                        judges.</p>
+                                </div>
+                            </article>
+                        </li>
+
+                        <!-- 6: from 5, east along the cross road, down the east road, then west along the south road -->
+                        <li class="town" data-town data-card="above-center" style="--x:56.3;--y:80.8"
+                            data-via="80.8,46.9 80.8,75.4 68.9,75.4 68.9,80.8">
+                            <span class="town__pin" data-n="6" aria-hidden="true"></span>
+                            <article class="town__card w-[13.5rem] md:w-80">
+                                <p
+                                    class="block bg-poke-blue px-2 py-1.5 text-[0.65rem] font-bold uppercase leading-none tracking-widest text-poke-yellow md:text-xs">
+                                    Day 2 &middot; 2:00 PM</p>
+                                <div class="px-2 pb-2 pt-2">
+                                    <h3 class="text-xs font-extrabold uppercase leading-snug text-[#1a1a40] md:text-sm">
+                                        Pitches</h3>
+                                    <p class="mt-1.5 text-[0.7rem] leading-relaxed text-slate-800 md:text-xs">Pitch your
+                                        project to the judges and show everyone what you built.</p>
+                                </div>
+                            </article>
+                        </li>
+
+                        <!-- 7: the long walk home: back along the same roads, up the left corridor, to the top-left -->
+                        <li class="town" data-town data-card="beside-start" style="--x:14.5;--y:30"
+                            data-via="68.9,80.8 68.9,75.4 80.8,75.4 80.8,46.9 64.6,46.9 64.6,30 39.7,30 39.7,35.8 22.8,35.8 22.8,58.2 14.5,58.2">
+                            <span class="town__pin" data-n="7" aria-hidden="true"></span>
+                            <article class="town__card w-[13.5rem] md:w-80">
+                                <p
+                                    class="block bg-poke-blue px-2 py-1.5 text-[0.65rem] font-bold uppercase leading-none tracking-widest text-poke-yellow md:text-xs">
+                                    Day 2 &middot; After the pitches</p>
+                                <div class="px-2 pb-2 pt-2">
+                                    <p
+                                        class="mb-1.5 inline-block bg-[#1a1a40] px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-widest text-white">
+                                        &#9654; Hall of Fame</p>
+                                    <h3 class="text-xs font-extrabold uppercase leading-snug text-[#1a1a40] md:text-sm">
+                                        Closing Ceremony</h3>
+                                    <p class="mt-1.5 text-[0.7rem] leading-relaxed text-slate-800 md:text-xs">Cheer on
+                                        the finalists as the champions are crowned and enter the Hall of Fame.</p>
+                                </div>
+                            </article>
+                        </li>
+                    </ol>
+
+                    <!-- Ash: one 48x64px frame of the sprite sheet; Schedule.js moves and animates him -->
+                    <div id="ash-sprite" class="facing-down" aria-hidden="true"></div>
+
+                    <p class="map__hint absolute bottom-4 left-1/2 z-30 -translate-x-1/2 border-4 border-[#1a1a40] bg-[#fffbe8] px-3 py-1.5 font-mono text-[0.7rem] font-bold uppercase tracking-widest text-[#1a1a40] shadow-[4px_4px_0_0_#1a1a40]"
+                        data-map-hint>
+                        Scroll to walk &#9660;
+                    </p>
+            </div>
             </div>
         </section>
 
