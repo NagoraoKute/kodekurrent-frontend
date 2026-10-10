@@ -9,6 +9,7 @@ import { Schedule } from './components/Schedule.js';
 import { TeamContact } from './components/TeamContact.js';
 import { OakChat } from './components/OakChat.js';
 import { Transitions } from './animations/Transitions.js';
+import { Sponsors } from './components/Sponsors.js';
 
 function init() {
     new Loader({
@@ -32,6 +33,8 @@ function init() {
         app: document.getElementById('app'),
         nav: document.getElementById('site-nav'),
     }).init();
+
+    new Sponsors().init();
 }
 
 if (document.readyState === 'loading') {

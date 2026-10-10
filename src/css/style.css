@@ -1466,3 +1466,269 @@
 .pc__status--error {
     background: #ffe0e0;
 }
+
+/* ==========================================================================
+   Sponsors: Gym Badge Cases
+   Layout is Tailwind (HTML); this is the 3D case, the hinge and the metallic badges.
+   ========================================================================== */
+
+.case { position: relative; width: 100%; max-width: 36rem; margin-inline: auto; }
+.case.is-open { z-index: 40; } /* the open case rises above its neighbour */
+
+/* Invisible button over the closed case: the click target for opening it */
+.case__open { position: absolute; inset: 0; z-index: 6; cursor: pointer; border-radius: 0.9rem; }
+.case__open:focus-visible { outline: 4px solid #3b4cca; outline-offset: 6px; }
+.case.is-open .case__open { display: none; }
+
+/* The frame is the 3D stage: its perspective applies to the lid, and Sponsors.js
+   moves/scales the whole frame to centre it. Overflow stays visible so the open lid can rise above it. */
+.case__frame { position: relative; aspect-ratio: 3 / 2; perspective: 1600px; }
+
+/* ---------- Lid ----------
+   Hinged on its top edge. GSAP animates rotationX 0 -> 180deg: the free edge swings toward the
+   viewer and over, so the lid ends up flipped ABOVE the tray, showing its lining. */
+.case__lid {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  transform-origin: 50% 0;
+  transform-style: preserve-3d;
+}
+.case.is-open .case__lid { pointer-events: none; }
+
+.case__lid-face {
+  position: absolute;
+  inset: 0;
+  border: 0.5rem solid #1a0f0a;
+  border-radius: 0.9rem;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden; /* each face is only seen from its own side */
+}
+
+/* Outer face: black leather with gold trim */
+.case__lid-face--outer {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.6rem;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 3px),
+    linear-gradient(145deg, #4a2a1c, #2b1a12 60%, #1a0f0a);
+  box-shadow:
+    inset 0 0 0 3px #d4a017,
+    inset 0 0 0 5px #1a0f0a,
+    0 0.6rem 0 #120a06,
+    0 1.2rem 1.6rem rgba(0, 0, 0, 0.45);
+  transition: box-shadow 0.25s ease;
+}
+.case__open:hover ~ .case__frame .case__lid-face--outer { /* gold glow on hover */
+  box-shadow:
+    inset 0 0 0 3px #ffd75e,
+    inset 0 0 0 5px #1a0f0a,
+    0 0.6rem 0 #120a06,
+    0 1.2rem 1.6rem rgba(0, 0, 0, 0.45),
+    0 0 1.6rem rgba(255, 203, 5, 0.55);
+}
+.case__emblem { width: 3.4rem; height: 3.4rem; } /* reuses the nav Pokéball */
+.case__title { color: #f5d36b; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.25); }
+
+/* Inner face: quilted satin lining. Pre-rotated 180deg so it reads upright once the lid has flipped.
+   After the flip its BOTTOM edge sits next to the hinge, so the plaque goes at the bottom. */
+.case__lid-face--inner {
+  transform: rotateX(180deg);
+  display: grid;
+  place-items: end center;
+  padding-bottom: 12%;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.07) 0 8px, transparent 8px 16px),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.07) 0 8px, transparent 8px 16px),
+    radial-gradient(ellipse at 50% 60%, #b01428, #6b0b18 80%);
+  box-shadow: inset 0 0 0 3px #d4a017, inset 0 0 1.5rem rgba(0, 0, 0, 0.5);
+}
+.case__lid-face--inner::after { /* dims the lining while a badge is in focus */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0);
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+.case.is-focus .case__lid-face--inner::after { background: rgba(0, 0, 0, 0.55); }
+
+.case__plaque {
+  padding: 0.35rem 1rem;
+  font: 800 clamp(0.65rem, 1.6vw, 0.9rem) / 1.2 ui-monospace, 'Courier New', monospace;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #3a2400;
+  background: linear-gradient(180deg, #fff0a8, #e0a800 55%, #b88400);
+  border: 2px solid #5a3b00;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ---------- Hinge: a brass barrel along the top edge, in front of both lid and tray ---------- */
+.case__hinge {
+  position: absolute;
+  top: -0.45rem;
+  right: 8%;
+  left: 8%;
+  z-index: 5;
+  height: 0.9rem;
+  border-radius: 0.45rem;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 3.2rem), /* knuckle gaps */
+    linear-gradient(180deg, #fff3b0 0%, #e0a800 35%, #8a6100 70%, #ffd75e 100%);        /* cylinder shading */
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Tray: leather frame around a red velvet interior ---------- */
+.case__tray {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: clamp(0.4rem, 2%, 0.9rem);
+  border: 0.7rem solid #2b1a12;
+  border-radius: 0.9rem;
+  background:
+    radial-gradient(ellipse at 50% 15%, rgba(255, 255, 255, 0.14), transparent 60%),
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.08) 0 2px, transparent 2px 4px), /* velvet pile */
+    radial-gradient(ellipse at 50% 40%, #c0182a 0%, #8a0f1c 65%, #55080f 100%);
+  box-shadow:
+    inset 0 0 0 2px #d4a017,                  /* gold inner trim */
+    inset 0 0.5rem 1.4rem rgba(0, 0, 0, 0.5),
+    0 0.6rem 0 #1a0f0a,
+    0 1.2rem 1.6rem rgba(0, 0, 0, 0.45);
+}
+
+/* Each badge sits in a recessed velvet slot */
+.case__slot {
+  position: relative; /* so a focused badge's z-index can lift it above the dim layer */
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, rgba(0, 0, 0, 0.55), rgba(40, 0, 6, 0.35) 70%);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- Focus layer: dim + detail card ---------- */
+.case__dim {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 35%, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.82));
+  opacity: 0;
+  pointer-events: none;
+}
+.case.is-focus .case__dim { pointer-events: auto; cursor: zoom-out; }
+
+.case__detail {
+  position: absolute;
+  right: 5%;
+  bottom: 5%;
+  left: 5%;
+  z-index: 15;
+  padding: 0.5rem 0.75rem;
+  background: #fffbe8;
+  border: 4px solid #1a1a40;
+  box-shadow: 4px 4px 0 #1a1a40;
+  opacity: 0;
+  pointer-events: none; /* hidden with opacity (not visibility) so it stays in the accessibility tree */
+}
+.case.is-focus .case__detail { pointer-events: auto; }
+
+/* ---------- Close button: straddles the tray's bottom edge ---------- */
+.case__close {
+  position: absolute;
+  bottom: -1.4rem;
+  left: 50%;
+  z-index: 7;
+  translate: -50% 0; /* individual property: GSAP animates `transform`, so no clash */
+  padding: 0.4rem 0.9rem;
+  color: #1a1a40;
+  cursor: pointer;
+  background: #ffcb05;
+  border: 4px solid #1a1a40;
+  box-shadow: 3px 3px 0 #1a1a40;
+  visibility: hidden;
+  opacity: 0;
+}
+.case__close:hover { background: #ffe066; }
+.case__close:focus-visible { outline: 3px solid #3b4cca; outline-offset: 3px; }
+
+/* ==========================================================================
+   Gym badges
+   ========================================================================== */
+.badge {
+  --a: #4ade80; /* face colours, set per sponsor inline */
+  --b: #15803d;
+  position: relative;
+  display: block;
+  width: 78%;
+  aspect-ratio: 1;
+  cursor: pointer;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.55)); /* the shadow sits outside the clipped shapes */
+  transition: translate 0.2s ease, filter 0.2s ease;  /* `translate`, so it can't clash with GSAP's transform */
+}
+.badge:hover,
+.badge:focus-visible { translate: 0 -3px; filter: drop-shadow(0 6px 4px rgba(0, 0, 0, 0.6)); }
+.badge:focus-visible { outline: 3px solid #fff; outline-offset: 4px; border-radius: 50%; }
+
+/* Shapes (each badge sets --shape; the face reuses it, inset, for a concentric rim) */
+.badge--hex      { --shape: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); }
+.badge--diamond  { --shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.badge--round    { --shape: circle(50% at 50% 50%); }
+.badge--star     { --shape: polygon(50% 0, 63% 18.6%, 85.4% 14.6%, 81.4% 37%, 100% 50%, 81.4% 63%, 85.4% 85.4%, 63% 81.4%, 50% 100%, 37% 81.4%, 14.6% 85.4%, 18.6% 63%, 0 50%, 18.6% 37%, 14.6% 14.6%, 37% 18.6%); }
+.badge--octagon  { --shape: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); }
+.badge--shield   { --shape: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%); }
+.badge--drop     { --shape: polygon(50% 0, 78% 38%, 90% 62%, 80% 86%, 50% 100%, 20% 86%, 10% 62%, 22% 38%); }
+.badge--pentagon { --shape: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%); }
+
+.badge__metal,
+.badge__face { position: absolute; clip-path: var(--shape); }
+
+/* Metallic rim */
+.badge__metal { inset: 0; }
+.badge--gold .badge__metal   { background: linear-gradient(135deg, #fff3b0 0%, #f5c400 28%, #a87400 52%, #ffe58a 74%, #c99a00 100%); }
+.badge--silver .badge__metal { background: linear-gradient(135deg, #ffffff 0%, #cfd6df 28%, #7e8896 52%, #eef2f7 74%, #9aa4b2 100%); }
+.badge__metal::after { /* rim highlight */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), transparent 40%);
+}
+
+/* Coloured face with the sponsor's mark */
+.badge__face {
+  inset: 14%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 35% 30%, var(--a), var(--b) 80%);
+  box-shadow: inset 0 0 0.6rem rgba(0, 0, 0, 0.45);
+}
+.badge__mark {
+  font: 800 clamp(0.7rem, 2vw, 1.3rem) / 1 ui-monospace, 'Courier New', monospace;
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+}
+.badge__logo { width: 100%; height: 100%; object-fit: contain; }
+/* Shiny glare: a fixed highlight plus a streak that sweeps across on hover/focus */
+.badge__face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.7) 46%, transparent 60%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.4), transparent 45%);
+  background-size: 250% 100%, 100% 100%;
+  background-position: 120% 0, 0 0;
+  background-repeat: no-repeat;
+  transition: background-position 0.8s ease;
+}
+.badge:hover .badge__face::after,
+.badge:focus-visible .badge__face::after { background-position: -20% 0, 0 0; }

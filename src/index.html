@@ -287,12 +287,206 @@
             <p class="font-mono text-xl text-slate-800">Win big with Pay Day!</p>
         </section>
 
-        <!-- 5. Sponsors Section (Hidden by default) -->
-        <section id="sponsors"
-            class="hidden flex min-h-screen flex-col items-center justify-center gap-4 px-4 pt-28 text-center">
-            <h1 class="pokemon-title text-5xl sm:text-7xl md:text-8xl">Sponsors</h1>
-            <p class="font-mono text-xl text-slate-800">Backed by the best.</p>
-        </section>
+        <!-- Sponsors: two gym-badge cases. Starts hidden; Transitions toggles `.hidden` when swapping sections. -->
+<section id="sponsors" data-gen="1" class="hidden min-h-screen px-4 pb-24 pt-28">
+  <div class="mx-auto max-w-6xl">
+    <h2 class="pokemon-title mb-3 text-center text-4xl sm:text-6xl">Sponsors</h2>
+    <p class="mx-auto mb-14 max-w-xl text-center font-mono text-sm font-bold uppercase tracking-widest text-slate-900">
+      Open a case to meet the trainers who made it possible
+    </p>
+
+    <div class="grid gap-14 md:grid-cols-2">
+
+      <!-- ======================= CASE 1: CURRENT ======================= -->
+      <div class="case" data-case="current">
+        <button type="button" class="case__open" data-case-open aria-label="Open the Current Sponsors badge case"></button>
+
+        <div class="case__frame" data-frame>
+          <!-- Lid: hinged on the top edge. Outer face = leather cover, inner face = satin lining -->
+          <div class="case__lid" data-lid>
+            <div class="case__lid-face case__lid-face--outer" aria-hidden="true">
+              <span class="nav-ball case__emblem"></span>
+              <span class="case__title font-mono text-sm font-extrabold uppercase tracking-widest sm:text-lg">Current Sponsors</span>
+              <span class="font-mono text-[0.65rem] uppercase tracking-widest text-[#f5d36b]/70">Click to open</span>
+            </div>
+            <div class="case__lid-face case__lid-face--inner" aria-hidden="true">
+              <span class="case__plaque">Current Sponsors</span>
+            </div>
+          </div>
+
+          <div class="case__hinge" aria-hidden="true"></div>
+
+          <!-- Tray: velvet interior with 8 badge slots (inert until the case is open) -->
+          <div class="case__tray" data-tray inert>
+            <ul class="grid h-full grid-cols-4 content-center gap-2 sm:gap-3">
+              <li class="case__slot">
+                <button type="button" class="badge badge--hex badge--gold" style="--a:#4ade80;--b:#15803d"
+                  data-name="Pallet Labs" data-tier="Title Sponsor" data-text="Dummy blurb: the title sponsor. Replace with a line or two about what they supported." data-url="#"
+                  aria-label="Pallet Labs, Title Sponsor">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">PL</span></span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <button type="button" class="badge badge--diamond badge--gold" style="--a:#2dd4bf;--b:#0f766e"
+                  data-name="Viridian Cloud" data-tier="Gold Sponsor" data-text="Dummy blurb: cloud credits for every team." data-url="#"
+                  aria-label="Viridian Cloud, Gold Sponsor">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">VC</span></span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <button type="button" class="badge badge--round badge--gold" style="--a:#94a3b8;--b:#334155"
+                  data-name="Pewter Systems" data-tier="Gold Sponsor" data-text="Dummy blurb: hardware for the tinkering track." data-url="#"
+                  aria-label="Pewter Systems, Gold Sponsor">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">PS</span></span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <button type="button" class="badge badge--star badge--gold" style="--a:#60a5fa;--b:#1d4ed8"
+                  data-name="Cerulean Pay" data-tier="Gold Sponsor" data-text="Dummy blurb: the prize pool." data-url="#"
+                  aria-label="Cerulean Pay, Gold Sponsor">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">CP</span></span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <button type="button" class="badge badge--octagon badge--gold" style="--a:#fb923c;--b:#c2410c"
+                  data-name="Vermilion Foods" data-tier="Silver Sponsor" data-text="Dummy blurb: midnight snacks and drinks." data-url="#"
+                  aria-label="Vermilion Foods, Silver Sponsor">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">VF</span></span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <button type="button" class="badge badge--shield badge--gold" style="--a:#c084fc;--b:#7e22ce"
+                  data-name="Lavender Media" data-tier="Silver Sponsor" data-text="Dummy blurb: media and livestream partner." data-url="#"
+                  aria-label="Lavender Media, Silver Sponsor">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">LM</span></span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <button type="button" class="badge badge--drop badge--gold" style="--a:#f472b6;--b:#be185d"
+                  data-name="Celadon Games" data-tier="Silver Sponsor" data-text="Dummy blurb: the mini-games corner." data-url="#"
+                  aria-label="Celadon Games, Silver Sponsor">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">CG</span></span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <button type="button" class="badge badge--pentagon badge--gold" style="--a:#f87171;--b:#b91c1c"
+                  data-name="Fuchsia Robotics" data-tier="Community Partner" data-text="Dummy blurb: community and outreach partner." data-url="#"
+                  aria-label="Fuchsia Robotics, Community Partner">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">FR</span></span>
+                </button>
+              </li>
+            </ul>
+
+            <!-- Dims the tray while a badge is in focus; clicking it puts the badge back -->
+            <div class="case__dim" data-dim></div>
+
+            <!-- Detail panel for the focused badge (filled by Sponsors.js) -->
+            <div class="case__detail" data-detail role="status" aria-live="polite">
+              <p class="font-mono text-[0.6rem] font-bold uppercase tracking-widest text-poke-blue sm:text-xs" data-detail-tier></p>
+              <h4 class="font-mono text-xs font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-base" data-detail-name></h4>
+              <p class="mt-1 font-mono text-[0.65rem] leading-relaxed text-slate-800 sm:text-sm" data-detail-text></p>
+              <a class="mt-1 font-mono text-[0.65rem] font-bold uppercase tracking-widest text-poke-blue underline sm:text-xs" data-detail-link href="#" target="_blank" rel="noopener noreferrer" hidden>Visit website &#9654;</a>
+            </div>
+          </div>
+
+          <button type="button" class="case__close font-mono text-xs font-extrabold uppercase tracking-widest" data-case-close>&#10005; Close</button>
+        </div>
+
+        <h3 class="case__caption mt-6 text-center font-mono text-sm font-bold uppercase tracking-widest text-slate-900">Current Sponsors</h3>
+      </div>
+
+      <!-- ======================= CASE 2: PAST ======================= -->
+      <div class="case" data-case="past">
+        <button type="button" class="case__open" data-case-open aria-label="Open the Past Sponsors badge case"></button>
+
+        <div class="case__frame" data-frame>
+          <div class="case__lid" data-lid>
+            <div class="case__lid-face case__lid-face--outer" aria-hidden="true">
+              <span class="nav-ball case__emblem"></span>
+              <span class="case__title font-mono text-sm font-extrabold uppercase tracking-widest sm:text-lg">Past Sponsors</span>
+              <span class="font-mono text-[0.65rem] uppercase tracking-widest text-[#f5d36b]/70">Click to open</span>
+            </div>
+            <div class="case__lid-face case__lid-face--inner" aria-hidden="true">
+              <span class="case__plaque">Past Sponsors</span>
+            </div>
+          </div>
+
+          <div class="case__hinge" aria-hidden="true"></div>
+
+          <div class="case__tray" data-tray inert>
+            <ul class="grid h-full grid-cols-4 content-center gap-2 sm:gap-3">
+              <li class="case__slot">
+                <button type="button" class="badge badge--hex badge--gold" data-name="Coca Cola" data-tier="Title Sponsor" data-text="Dummy blurb." data-url="#">
+                      <img class="badge__logo" src="/sponsors/coca-cola.png" alt="Coca Cola" />
+                    </span>
+                </button>
+              </li>
+
+              <li class="case__slot">
+                <button type="button" class="badge badge--hex badge--gold" data-name="Roostoo" data-tier="Gold Sponsor" data-text="Dummy blurb." data-url="#">
+                      <img class="badge__logo" src="/sponsors/roostoo.png" alt="Roostoo" />
+                    </span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <button type="button" class="badge badge--hex badge--gold" data-name="Prodigal Ai" data-tier="Silver Sponsor" data-text="Dummy blurb." data-url="#">
+                      <img class="badge__logo" src="/sponsors/prodigal-ai.png" alt="Prodigal Ai" />
+                    </span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <button type="button" class="badge badge--hex badge--gold" data-name="Rabbitt Ai" data-tier="Silver Sponsor" data-text="Dummy blurb." data-url="#">
+                      <img class="badge__logo" src="/sponsors/rabbitt-ai.png" alt="Rabbit Ai" />
+                    </span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <button type="button" class="badge badge--hex badge--gold" data-name="GrabOn" data-tier="Silver Sponsor" data-text="Dummy blurb." data-url="#">
+                      <img class="badge__logo" src="/sponsors/grabon.png" alt="Grabon" />
+                    </span>
+                </button>
+              </li>
+              <li class="case__slot">
+                <!-- <button type="button" class="badge badge--shield badge--silver" style="--a:#a3e635;--b:#4d7c0f"
+                  data-name="Safari Outdoors" data-tier="Past Sponsor" data-text="Dummy blurb: supported an earlier edition." data-url="#"
+                  aria-label="Safari Outdoors, Past Sponsor">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">SO</span></span>
+                </button>  -->
+              </li>
+              <li class="case__slot">
+                <!-- <button type="button" class="badge badge--drop badge--silver" style="--a:#d6a36b;--b:#78350f"
+                  data-name="Victory Road Gear" data-tier="Past Sponsor" data-text="Dummy blurb: supported an earlier edition." data-url="#"
+                  aria-label="Victory Road Gear, Past Sponsor">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">VR</span></span>
+                </button> -->
+              </li>
+              <li class="case__slot">
+                <!-- <button type="button" class="badge badge--pentagon badge--silver" style="--a:#34d399;--b:#047857"
+                  data-name="Oak Foundation" data-tier="Past Sponsor" data-text="Dummy blurb: supported an earlier edition." data-url="#"
+                  aria-label="Oak Foundation, Past Sponsor">
+                  <span class="badge__metal"></span><span class="badge__face"><span class="badge__mark">OF</span></span>
+                </button> -->
+              </li>
+            </ul>
+
+            <div class="case__dim" data-dim></div>
+
+            <div class="case__detail" data-detail role="status" aria-live="polite">
+              <p class="font-mono text-[0.6rem] font-bold uppercase tracking-widest text-poke-blue sm:text-xs" data-detail-tier></p>
+              <h4 class="font-mono text-xs font-extrabold uppercase leading-snug text-[#1a1a40] sm:text-base" data-detail-name></h4>
+              <p class="mt-1 font-mono text-[0.65rem] leading-relaxed text-slate-800 sm:text-sm" data-detail-text></p>
+              <a class="mt-1 font-mono text-[0.65rem] font-bold uppercase tracking-widest text-poke-blue underline sm:text-xs" data-detail-link href="#" target="_blank" rel="noopener noreferrer" hidden>Visit website &#9654;</a>
+            </div>
+          </div>
+
+          <button type="button" class="case__close font-mono text-xs font-extrabold uppercase tracking-widest" data-case-close>&#10005; Close</button>
+        </div>
+
+        <h3 class="case__caption mt-6 text-center font-mono text-sm font-bold uppercase tracking-widest text-slate-900">Past Sponsors</h3>
+      </div>
+    </div>
+  </div>
+</section>
 
         <!-- 6. FAQs Section (Hidden by default) -->
         <!-- FAQs: Kanto Pokédex. Starts hidden; Transitions toggles `.hidden` when swapping sections. -->
