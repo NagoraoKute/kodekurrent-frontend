@@ -221,3 +221,69 @@
         animation: none;
     }
 }
+
+/* One exchange (7s):
+     0.4s-1.6s  Greninja winds up, lunges and throws a Water Shuriken
+     1.6s       it hits Sceptile (burst + shake)
+     3.6s-4.7s  Sceptile leans back, lunges and fires a Dragon Pulse
+     4.7s       it hits Greninja (burst + shake)
+     then a breather until the loop restarts */
+
+@keyframes battle-ally {
+  0%, 6%    { transform: translateX(0);       filter: var(--shadow) brightness(1); }
+  10%       { transform: translateX(-1.2cqw); filter: var(--shadow) brightness(1); }   /* wind up */
+  14%       { transform: translateX(1.8cqw);  filter: var(--shadow) brightness(1); }   /* lunge */
+  20%, 66%  { transform: translateX(0);       filter: var(--shadow) brightness(1); }
+  67%       { transform: translateX(-1.6cqw); filter: var(--shadow) brightness(2.2); } /* hit by the pulse */
+  69%       { transform: translateX(1cqw);    filter: var(--shadow) brightness(1.4); }
+  71%       { transform: translateX(-0.8cqw); filter: var(--shadow) brightness(1); }
+  74%, 100% { transform: translateX(0);       filter: var(--shadow) brightness(1); }
+}
+
+@keyframes battle-foe {
+  0%, 22%   { transform: translateX(0);       filter: var(--shadow) brightness(1); }
+  23%       { transform: translateX(1.6cqw);  filter: var(--shadow) brightness(2.2); } /* hit by the shuriken */
+  25%       { transform: translateX(-1cqw);   filter: var(--shadow) brightness(1.4); }
+  27%       { transform: translateX(0.8cqw);  filter: var(--shadow) brightness(1); }
+  30%, 48%  { transform: translateX(0);       filter: var(--shadow) brightness(1); }
+  52%       { transform: translateX(1.2cqw);  filter: var(--shadow) brightness(1); }   /* wind up */
+  56%       { transform: translateX(-2cqw);   filter: var(--shadow) brightness(1); }   /* lunge */
+  62%, 100% { transform: translateX(0);       filter: var(--shadow) brightness(1); }
+}
+
+@keyframes fx-shuriken {
+  0%, 9%    { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0); }
+  10%       { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(0.2); }
+  14%       { opacity: 1; transform: translate(0, 0) rotate(360deg) scale(1); }             /* charge */
+  23%       { opacity: 1; transform: translate(35.5cqw, -2.5cqw) rotate(1440deg) scale(1); } /* flight */
+  24%       { opacity: 0; transform: translate(35.5cqw, -2.5cqw) rotate(1500deg) scale(1.8); }
+  25%, 100% { opacity: 0; transform: translate(35.5cqw, -2.5cqw) rotate(1500deg) scale(0); }
+}
+
+@keyframes fx-pulse {
+  0%, 53%   { opacity: 0; transform: translate(0, 0) scale(0); }
+  55%       { opacity: 1; transform: translate(0, 0) scale(0.3); }
+  58%       { opacity: 1; transform: translate(0, 0) scale(1); }               /* charge */
+  67%       { opacity: 1; transform: translate(-41cqw, 6cqw) scale(1); }       /* flight */
+  68%       { opacity: 0; transform: translate(-41cqw, 6cqw) scale(1.8); }
+  69%, 100% { opacity: 0; transform: translate(-41cqw, 6cqw) scale(0); }
+}
+
+@keyframes fx-hit-foe {
+  0%, 22.5% { opacity: 0; transform: scale(0); }
+  23.5%     { opacity: 1; transform: scale(0.5); }
+  30%       { opacity: 0; transform: scale(1.6); }
+  100%      { opacity: 0; transform: scale(1.6); }
+}
+
+@keyframes fx-hit-ally {
+  0%, 66.5% { opacity: 0; transform: scale(0); }
+  67.5%     { opacity: 1; transform: scale(0.5); }
+  74%       { opacity: 0; transform: scale(1.6); }
+  100%      { opacity: 0; transform: scale(1.6); }
+}
+
+@keyframes fx-ring {
+  from { opacity: 0.9; transform: scale(0.6); }
+  to   { opacity: 0;   transform: scale(1.2); }
+}

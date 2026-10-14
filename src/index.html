@@ -64,7 +64,7 @@
             <a href="#about" data-target="about" data-pokemon="charizard"
                 class="nav-tab flex flex-col items-center gap-1 rounded-xl px-1 sm:px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-poke-yellow">
                 <span class="nav-ball" aria-hidden="true"></span>
-                <span class="pokemon-title pokemon-title--sm text-xs sm:text-base md:text-xl">About</span>
+                <span class="pokemon-title pokemon-title--sm text-xs sm:text-base md:text-xl">PS/Theme</span>
             </a>
 
             <a href="#schedule" data-target="schedule" data-pokemon="dragonite"
@@ -102,14 +102,72 @@
     <!-- z-0: Main content -->
     <main id="app" class="relative z-0">
 
-        <!-- 1. Home Section -->
-        <section id="home" data-gen="1"
-            class="flex min-h-screen flex-col items-center justify-center gap-4 px-4 pt-28 text-center">
-            <h1 class="pokemon-title text-5xl sm:text-7xl md:text-8xl">Kodekurrent</h1>
-            <p class="pokemon-title text-xl sm:text-3xl">Pokémon Edition</p>
-            <p class="font-mono text-sm text-slate-800">
-                Foundation check: if this title is yellow with a blue outline, styling works.
-            </p>
+        <!-- Home: battle arena on top, PS/Theme below. One section, one scroll. -->
+        <section id="home" data-gen="1" class="min-h-screen">
+
+            <!-- ============ Part 1: title, battlefield, tagline, Register ============ -->
+            <div class="flex flex-col items-center gap-6 px-7 pb-20 pt-28 text-center">
+
+                <!-- Title, written the original way -->
+                <div>
+                    <h1 class="pokemon-title text-5xl sm:text-7xl md:text-8xl">Kodekurrent 2.0</h1>
+                    <p class="pokemon-title text-xl sm:text-3xl">Pok&eacute;mon Edition</p>
+                </div>
+
+                <!-- Battlefield: a CSS-drawn pitch in perspective, two sprites and four attack effects -->
+                <div class="battlefield mx-auto w-full max-w-[900px]" role="img" aria-label="Greninja and Mega Sceptile trading attacks">
+                    <div class="battlefield__stage" aria-hidden="true">
+                    <div class="field">
+                        <span class="field__box field__box--l"></span>
+                        <span class="field__box field__box--r"></span>
+                    </div>
+                    </div>
+
+                    <img class="battlefield__mon battlefield__mon--ally" src="/images/greninja-ash-back.gif" alt="" draggable="false" />
+                    <img class="battlefield__mon battlefield__mon--foe" src="/images/sceptile-mega.gif" alt="" draggable="false" />
+
+                    <!-- Attack effects, all driven by the 7s battle loop in animations.css -->
+                    <span class="fx fx-shuriken" aria-hidden="true"></span> <!-- Greninja: Water Shuriken -->
+                    <span class="fx fx-hit fx-hit--foe" aria-hidden="true"></span>
+                    <span class="fx fx-pulse" aria-hidden="true"></span>    <!-- Sceptile: Dragon Pulse -->
+                    <span class="fx fx-hit fx-hit--ally" aria-hidden="true"></span>
+                </div>
+
+                <div class="flex flex-col items-center gap-3">
+                    <p class="font-mono text-sm font-bold text-[#1d2f55] sm:text-base">Your next adventure starts here</p>
+
+                    <!-- Same style as the "pikachu! Let's go!" button in the Figma. Replace the href with your Hacktober URL -->
+                    <a
+                    href="https://hacktober.example"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-block rounded-lg border border-[#4c63c9]/70 bg-[#1d2f55] px-6 py-2.5 font-mono text-sm font-bold text-poke-yellow shadow-[0_4px_14px_rgba(10,20,50,0.45)] transition hover:-translate-y-0.5 hover:bg-[#27406f] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white active:translate-y-0 sm:text-base"
+                    >
+                    Register
+                    </a>
+                </div>
+            </div>
+
+            <!-- ============ Part 2: PS / Theme (the target of the PS/Theme tab) ============ -->
+            <div
+                id="theme"
+                role="region"
+                aria-labelledby="theme-heading"
+                class="theme relative flex min-h-screen items-center justify-center px-4 pb-44 pt-28 sm:pb-28"
+            >
+                <div class="glass-card w-full max-w-2xl p-6 text-white sm:p-10">
+                <h2 id="theme-heading" class="pokemon-title mb-5 text-center text-3xl sm:text-5xl">PS / Theme</h2>
+
+                <!-- Placeholder copy: replace with your About text, theme and problem statements -->
+                <div class="space-y-4 font-mono text-sm leading-relaxed sm:text-base">
+                    <p>Kodekurrent is the hackathon hosted by the IEEE Student Chapter at RGIPT. Trainers team up to turn ideas into working projects, learn from mentors and show what they built.</p>
+                    <p>Pick a problem statement, build with your team and take it all the way to the judges. The theme and problem statements for this edition go here.</p>
+                </div>
+                </div>
+
+                <!-- Swap the src for any Pokémon image -->
+                <img class="theme__mon" src="/pokemon/pikachu.gif" alt="" draggable="false" />
+            </div>
         </section>
 
         <!-- 2. About Section (Hidden by default) -->

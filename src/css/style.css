@@ -1732,3 +1732,201 @@
 }
 .badge:hover .badge__face::after,
 .badge:focus-visible .badge__face::after { background-position: -20% 0, 0 0; }
+
+/* ==========================================================================
+   Home: battlefield
+   Everything inside is sized in cqw (1% of the battlefield's width), so the whole scene,
+   sprites and effects included, scales as one picture.
+   ========================================================================== */
+.battlefield {
+  --cycle: 7s; /* length of one full exchange of attacks */
+  position: relative;
+  aspect-ratio: 9 / 4; /* room for the pitch (bottom) and the sprites standing above it */
+  container-type: inline-size;
+}
+
+/* The pitch is drawn flat, then tilted back. The perspective is in cqw so the
+   "camera" scales with the scene (px would flatten it on phones). */
+.battlefield__stage {
+  position: absolute;
+  inset: 0;
+  perspective: 1000px; /* fallback */
+  perspective: 115cqw;
+}
+.field {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  aspect-ratio: 900 / 480;
+  transform-origin: 50% 100%;
+  transform: rotateX(62deg);
+  background:
+    radial-gradient(ellipse at 50% 55%, rgba(255, 255, 255, 0.22), transparent 65%),
+    linear-gradient(180deg, #f1bd5f 0%, #f7d58c 55%, #f4c872 100%); /* sand */
+  border: 1.2cqw solid #e29a33; /* clay border */
+  border-radius: 1.2cqw;
+  box-shadow: inset 0 0 0 0.5cqw rgba(255, 255, 255, 0.25);
+}
+.field::before { /* white boundary + centre line */
+  content: '';
+  position: absolute;
+  inset: 4% 3%;
+  border: 0.6cqw solid rgba(255, 255, 255, 0.95);
+  background: linear-gradient(
+    90deg,
+    transparent calc(50% - 0.3cqw),
+    rgba(255, 255, 255, 0.95) calc(50% - 0.3cqw) calc(50% + 0.3cqw),
+    transparent calc(50% + 0.3cqw)
+  );
+}
+.field::after { /* centre circle + dot */
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 34%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 0.6cqw solid rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 5%, transparent 6%);
+}
+.field__box { /* the two side boxes */
+  position: absolute;
+  top: 28%;
+  width: 17%;
+  height: 44%;
+  border: 0.6cqw solid rgba(255, 255, 255, 0.95);
+}
+.field__box--l { left: 3%; }
+.field__box--r { right: 3%; }
+
+/* ---------- Sprites ----------
+   Greninja (seen from behind) stands on the near side, Sceptile on the far side, so he is smaller.
+   Tune left/right/bottom/width to put their feet where you want them. */
+.battlefield__mon {
+  --shadow: drop-shadow(0 0.5cqw 0.4cqw rgba(0, 0, 0, 0.35));
+  position: absolute;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  filter: var(--shadow) brightness(1);
+}
+.battlefield__mon--ally {
+  bottom: 7cqw;
+  left: 12cqw;
+  z-index: 2;
+  width: 20cqw;
+  animation: battle-ally var(--cycle) linear infinite;
+}
+.battlefield__mon--foe {
+  right: 16cqw;
+  bottom: 10cqw;
+  z-index: 1;
+  width: 14cqw;
+  animation: battle-foe var(--cycle) linear infinite;
+}
+
+/* ---------- Attack effects (invisible except during their moment of the loop) ---------- */
+.fx {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Greninja: Water Shuriken, a spinning four-pointed star */
+.fx-shuriken {
+  bottom: 15cqw;
+  left: 36cqw;
+  width: 7cqw;
+  aspect-ratio: 1;
+  filter: drop-shadow(0 0 1cqw #6fd3ff) drop-shadow(0 0 0.4cqw #fff); /* glow sits on the wrapper: clip-path would cut it */
+  animation: fx-shuriken var(--cycle) linear infinite;
+}
+.fx-shuriken::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, #f4feff 0 18%, #7fdcff 40%, #1d7fe0 85%);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+}
+
+/* Sceptile: Dragon Pulse, a glowing energy orb with a trailing ring */
+.fx-pulse {
+  bottom: 18cqw;
+  left: 62cqw;
+  width: 8cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f2fff7 0 20%, #7dffb2 38%, #19c37d 62%, rgba(25, 195, 125, 0) 72%);
+  box-shadow: 0 0 2cqw 0.6cqw rgba(60, 255, 170, 0.65);
+  animation: fx-pulse var(--cycle) linear infinite;
+}
+.fx-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  border: 0.5cqw solid rgba(125, 255, 178, 0.8);
+  border-radius: 50%;
+  animation: fx-ring 0.45s ease-out infinite;
+}
+
+/* Impact bursts, centred on the sprite that gets hit */
+.fx-hit {
+  width: 14cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.fx-hit--foe {
+  bottom: 14cqw;
+  left: 68cqw;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0, rgba(111, 211, 255, 0.85) 30%, rgba(29, 127, 224, 0) 66%);
+  animation: fx-hit-foe var(--cycle) linear infinite;
+}
+.fx-hit--ally {
+  bottom: 9cqw;
+  left: 18cqw;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0, rgba(125, 255, 178, 0.85) 30%, rgba(25, 195, 125, 0) 66%);
+  animation: fx-hit-ally var(--cycle) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battlefield__mon,
+  .fx { animation: none; }
+  .fx { display: none; }
+}
+/* ---------- PS / Theme section ---------- */
+.theme {
+  background: url('/images/lab-bg.jpg') center / cover no-repeat; /* covers the full width of the section */
+}
+
+/* Pokémon in the bottom-right corner. It sits a little in from the edge on purpose:
+   the Oak widget is fixed in that exact corner and would cover it otherwise. */
+.theme__mon {
+  position: absolute;
+  right: clamp(8rem, 14vw, 12rem);
+  bottom: 0;
+  width: clamp(6.5rem, 16vw, 12rem);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 0.5rem 0.4rem rgba(0, 0, 0, 0.4));
+}
+
+/* ---------- Glassmorphism card ---------- */
+.glass-card {
+  background: rgba(12, 20, 40, 0.42); /* dark-tinted glass keeps white text readable on any lab background */
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 1.5rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),   /* top-edge highlight */
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-card { background: rgba(12, 20, 40, 0.82); } /* no blur available: make it more opaque instead */
+}

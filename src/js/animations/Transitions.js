@@ -764,19 +764,28 @@ export class Transitions {
         if (this.busy) return;
 
         const { target, pokemon } = event.detail ?? {};
-        const next = target ? document.getElementById(target) : null;
-        if (!next || !this.app.contains(next)) {
+        const anchor = target ? document.getElementById(target) : null;
+        if (!anchor || !this.app.contains(anchor)) {
             console.warn(`[Transitions] No section found for target "${target}".`);
             return;
         }
 
+        // A target can be an anchor INSIDE a section (e.g. #theme inside #home); it belongs to that section
+        const next = anchor.closest('#app > section') ?? anchor;
         const current = this.getSections().find((s) => !s.classList.contains('hidden'));
-        if (current === next) return;
 
-        this.play(next, target, pokemon, this.findTab(target));
-    };
+        if (current === next) {
+            // Already on that page: no screen wipe, just scroll (to the anchor, or to the top for the section itself)
+            const behavior = this.reducedMotion.matches ? 'auto' : 'smooth';
+            if (anchor === next) window.scrollTo({ top: 0, behavior });
+            else anchor.scrollIntoView({ behavior, block: 'start' });
+            return;
+        }
 
-    async play(next, target, pokemon, tab) {
+        this.play(next, target, pokemon, this.findTab(target), anchor);
+        };
+
+    async play(next, target, pokemon, tab, anchor = next) {
         this.busy = true; // set BEFORE the await so clicks stay blocked while the GIF loads
         this.currentTarget = target;
         document.documentElement.style.overflow = 'hidden'; // no scrolling mid-transition
@@ -826,16 +835,18 @@ export class Transitions {
         } catch (err) {
             // Never leave the user stuck behind a broken effect
             console.error('[Transitions] Effect failed, swapping without animation.', err);
-            this.swap(next);
+            this.swap(next, anchor);
             this.finish();
         }
     }
 
-    swap(next) {
+    swap(next, anchor = next) {
         this.getSections().forEach((section) => {
             section.classList.toggle('hidden', section !== next);
         });
-        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        // Land on the anchor (e.g. #theme), or at the top of the section
+        if (anchor !== next) anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
+        else window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }
 
     finish = () => {
