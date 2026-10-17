@@ -13,9 +13,15 @@
    Until they exist, the fallback stack in .pokemon-title is used. */
 @font-face {
     font-family: 'Pokemon Solid';
-    src:
-        url('/fonts/PokemonSolid.woff2') format('woff2'),
-        url('/fonts/PokemonSolid.ttf') format('truetype');
+    src: url('/fonts/PokemonSolid.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pokemon Hollow';
+    src: url('/fonts/PokemonHollow.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -54,15 +60,24 @@
 
 /* ---------- Nav label: slimmer outline & shadow for small text ---------- */
 .pokemon-title--sm {
-    -webkit-text-stroke-width: 1px;
-    letter-spacing: 0.04em;
-    /* Reduce the massive 3D block shadow so small nav text remains readable */
+    -webkit-text-stroke-width: 0.5px;
+    letter-spacing: 0.02em;
     text-shadow:
-        2px 2px 0 #2a3b8f,
-        3px 3px 0 #2a3b8f,
-        4px 4px 5px rgba(0, 0, 0, 0.5);
+        1px 1px 0 #2a3b8f,
+        2px 2px 3px rgba(0, 0, 0, 0.5);
     transform: none;
     /* Keep nav tabs flat and crisp */
+}
+
+@media (min-width: 640px) {
+    .pokemon-title--sm {
+        -webkit-text-stroke-width: 1px;
+        letter-spacing: 0.04em;
+        text-shadow:
+            2px 2px 0 #2a3b8f,
+            3px 3px 0 #2a3b8f,
+            4px 4px 5px rgba(0, 0, 0, 0.5);
+    }
 }
 
 /* ---------- CSS 3D Pokéball (navigation) ----------
@@ -70,8 +85,8 @@
 .nav-ball {
     position: relative;
     display: block;
-    width: 2rem;
-    height: 2rem;
+    width: 1.65rem;
+    height: 1.65rem;
     border-radius: 50%;
     background:
         /* specular hotspot */
@@ -87,7 +102,7 @@
     transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.25s ease;
 }
 
-/* Scale up the balls slightly on larger screens so they aren't too tiny */
+/* Scale up the balls on larger screens so they aren't too tiny */
 @media (min-width: 640px) {
     .nav-ball {
         width: 2.75rem;
@@ -154,6 +169,24 @@
    Kanto Pokédex (FAQ)
    Raw CSS because of the stacked box-shadows, gradients and glass effects.
    ========================================================================== */
+
+#faqs {
+    background: url('/images/faq-bg.jpeg') center / cover no-repeat;
+    position: relative;
+}
+
+#faqs:not(.hidden) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (min-width: 768px) {
+    #faqs {
+        background-attachment: fixed;
+    }
+}
 
 /* ---------- Red plastic casing ---------- */
 .pokedex {
@@ -537,20 +570,30 @@
    (Toggled with .is-seen rather than Tailwind's `hidden`: this rule's `display` would override it.) */
 .oak-badge {
     position: absolute;
-    top: 0.15rem;
-    right: 1.6rem;
+    top: -0.1rem;
+    right: 0.9rem;
     z-index: 2;
     display: grid;
     place-items: center;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1.25rem;
+    height: 1.25rem;
     border: 2px solid #fff;
     border-radius: 50%;
     background: #e53935;
     color: #fff;
-    font: 800 0.85rem/1 ui-monospace, 'Courier New', monospace;
+    font: 800 0.75rem/1 ui-monospace, 'Courier New', monospace;
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
     animation: oak-badge-pulse 1.2s ease-in-out infinite;
+}
+
+@media (min-width: 640px) {
+    .oak-badge {
+        top: 0.15rem;
+        right: 1.6rem;
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: 0.85rem;
+    }
 }
 
 .oak-badge.is-seen {
@@ -748,6 +791,15 @@
     animation: town-ping 1.2s ease-out infinite;
 }
 
+/* Active town and card must always stack above all other pins */
+.town.is-active {
+    z-index: 50;
+}
+
+.town.is-active .town__card {
+    z-index: 60;
+}
+
 /* Event card: invisible while Ash walks; Schedule.js pops it in while he stands in this town.
    It is hidden with opacity (not visibility/display) so screen readers can still read every event. */
 .town__card {
@@ -787,6 +839,17 @@
     left: 0;
     translate: -50% 0;
     transform-origin: 50% 100%;
+}
+
+@media (max-width: 640px) {
+    /* For Town 1 on mobile: position above so it stays completely clear of Town 6 and Prof Oak */
+    .town:first-child[data-card='beside-start'] .town__card {
+        bottom: 3.8rem;
+        left: 0;
+        top: auto;
+        translate: -15% 0;
+        transform-origin: 15% 100%;
+    }
 }
 
 /* clears Ash's head */
@@ -1468,465 +1531,754 @@
 }
 
 /* ==========================================================================
+   Prizes Section
+   ========================================================================== */
+
+#prizes {
+    background: url('/images/prize-bg.jpeg') center / cover no-repeat;
+    position: relative;
+}
+
+#prizes:not(.hidden) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-right: clamp(2rem, 8vw, 8rem);
+    padding-bottom: clamp(4.5rem, 12vh, 8rem);
+}
+
+#prizes .pokemon-title {
+    font-family: 'Pokemon Solid', Impact, 'Arial Black', sans-serif;
+    color: #ffcb05;
+    -webkit-text-stroke: 4px #2a75bb;
+    paint-order: stroke fill;
+    letter-spacing: 0.06em;
+    display: inline-block;
+    transform: perspective(600px) rotate(-3deg) skew(-1deg);
+    text-shadow:
+        -3px -3px 0 #2a75bb,
+         3px -3px 0 #2a75bb,
+        -3px  3px 0 #2a75bb,
+         3px  3px 0 #2a75bb,
+         4px  4px 0 #1c4b82,
+         5px  5px 0 #1c4b82,
+         6px  6px 0 #1c4b82,
+         7px  7px 0 #1c4b82,
+         8px  8px 0 #1c4b82,
+         9px  9px 0 #1c4b82,
+        10px 10px 0 #1c4b82,
+        11px 11px 0 #1c4b82,
+        12px 12px 0 #1c4b82,
+        14px 14px 0 #1c4b82,
+        16px 16px 15px rgba(0, 0, 0, 0.6);
+    filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#prizes .pokemon-title:hover {
+    transform: perspective(600px) rotate(-1deg) scale(1.05);
+}
+
+.prizes-burst-text {
+    font-family: 'Pokemon Solid', Impact, 'Arial Black', sans-serif;
+    color: #ffcb05;
+    -webkit-text-stroke: 3px #2a75bb;
+    paint-order: stroke fill;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    transform: perspective(600px) rotate(-4deg) skew(-2deg);
+    text-shadow:
+        -2px -2px 0 #2a75bb,
+         2px -2px 0 #2a75bb,
+        -2px  2px 0 #2a75bb,
+         2px  2px 0 #2a75bb,
+         3px  3px 0 #1c4b82,
+         4px  4px 0 #1c4b82,
+         5px  5px 0 #1c4b82,
+         6px  6px 0 #1c4b82,
+         7px  7px 0 #1c4b82,
+         8px  8px 0 #1c4b82,
+         9px  9px 0 #1c4b82,
+        10px 10px 0 #1c4b82,
+        12px 12px 15px rgba(0, 0, 0, 0.5);
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
+}
+
+@media (min-width: 768px) {
+    #prizes {
+        background-attachment: fixed;
+    }
+
+    #prizes .pokemon-title {
+        -webkit-text-stroke: 6px #2a75bb;
+    }
+
+    .prizes-burst-text {
+        -webkit-text-stroke: 5px #2a75bb;
+    }
+}
+
+/* ==========================================================================
    Sponsors: Gym Badge Cases
    Layout is Tailwind (HTML); this is the 3D case, the hinge and the metallic badges.
    ========================================================================== */
 
-.case { position: relative; width: 100%; max-width: 36rem; margin-inline: auto; }
-.case.is-open { z-index: 40; } /* the open case rises above its neighbour */
+#sponsors {
+    background: url('/images/sponser-bg.jpeg') center / cover no-repeat;
+    position: relative;
+}
+
+#sponsors:not(.hidden) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (min-width: 768px) {
+    #sponsors {
+        background-attachment: fixed;
+    }
+}
+
+.case {
+    position: relative;
+    width: 100%;
+    max-width: 36rem;
+    margin-inline: auto;
+}
+
+.case.is-open {
+    z-index: 40;
+}
+
+/* the open case rises above its neighbour */
 
 /* Invisible button over the closed case: the click target for opening it */
-.case__open { position: absolute; inset: 0; z-index: 6; cursor: pointer; border-radius: 0.9rem; }
-.case__open:focus-visible { outline: 4px solid #3b4cca; outline-offset: 6px; }
-.case.is-open .case__open { display: none; }
+.case__open {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    cursor: pointer;
+    border-radius: 0.9rem;
+}
+
+.case__open:focus-visible {
+    outline: 4px solid #3b4cca;
+    outline-offset: 6px;
+}
+
+.case.is-open .case__open {
+    display: none;
+}
 
 /* The frame is the 3D stage: its perspective applies to the lid, and Sponsors.js
    moves/scales the whole frame to centre it. Overflow stays visible so the open lid can rise above it. */
-.case__frame { position: relative; aspect-ratio: 3 / 2; perspective: 1600px; }
+.case__frame {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    perspective: 1600px;
+}
 
 /* ---------- Lid ----------
    Hinged on its top edge. GSAP animates rotationX 0 -> 180deg: the free edge swings toward the
    viewer and over, so the lid ends up flipped ABOVE the tray, showing its lining. */
 .case__lid {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  transform-origin: 50% 0;
-  transform-style: preserve-3d;
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    transform-origin: 50% 0;
+    transform-style: preserve-3d;
 }
-.case.is-open .case__lid { pointer-events: none; }
+
+.case.is-open .case__lid {
+    pointer-events: none;
+}
 
 .case__lid-face {
-  position: absolute;
-  inset: 0;
-  border: 0.5rem solid #1a0f0a;
-  border-radius: 0.9rem;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden; /* each face is only seen from its own side */
+    position: absolute;
+    inset: 0;
+    border: 0.5rem solid #1a0f0a;
+    border-radius: 0.9rem;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* each face is only seen from its own side */
 }
 
 /* Outer face: black leather with gold trim */
 .case__lid-face--outer {
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 0.6rem;
-  text-align: center;
-  background:
-    radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 3px),
-    linear-gradient(145deg, #4a2a1c, #2b1a12 60%, #1a0f0a);
-  box-shadow:
-    inset 0 0 0 3px #d4a017,
-    inset 0 0 0 5px #1a0f0a,
-    0 0.6rem 0 #120a06,
-    0 1.2rem 1.6rem rgba(0, 0, 0, 0.45);
-  transition: box-shadow 0.25s ease;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.6rem;
+    text-align: center;
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 3px),
+        linear-gradient(145deg, #4a2a1c, #2b1a12 60%, #1a0f0a);
+    box-shadow:
+        inset 0 0 0 3px #d4a017,
+        inset 0 0 0 5px #1a0f0a,
+        0 0.6rem 0 #120a06,
+        0 1.2rem 1.6rem rgba(0, 0, 0, 0.45);
+    transition: box-shadow 0.25s ease;
 }
-.case__open:hover ~ .case__frame .case__lid-face--outer { /* gold glow on hover */
-  box-shadow:
-    inset 0 0 0 3px #ffd75e,
-    inset 0 0 0 5px #1a0f0a,
-    0 0.6rem 0 #120a06,
-    0 1.2rem 1.6rem rgba(0, 0, 0, 0.45),
-    0 0 1.6rem rgba(255, 203, 5, 0.55);
+
+.case__open:hover~.case__frame .case__lid-face--outer {
+    /* gold glow on hover */
+    box-shadow:
+        inset 0 0 0 3px #ffd75e,
+        inset 0 0 0 5px #1a0f0a,
+        0 0.6rem 0 #120a06,
+        0 1.2rem 1.6rem rgba(0, 0, 0, 0.45),
+        0 0 1.6rem rgba(255, 203, 5, 0.55);
 }
-.case__emblem { width: 3.4rem; height: 3.4rem; } /* reuses the nav Pokéball */
-.case__title { color: #f5d36b; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.25); }
+
+.case__emblem {
+    width: 3.4rem;
+    height: 3.4rem;
+}
+
+/* reuses the nav Pokéball */
+.case__title {
+    color: #f5d36b;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.25);
+}
 
 /* Inner face: quilted satin lining. Pre-rotated 180deg so it reads upright once the lid has flipped.
    After the flip its BOTTOM edge sits next to the hinge, so the plaque goes at the bottom. */
 .case__lid-face--inner {
-  transform: rotateX(180deg);
-  display: grid;
-  place-items: end center;
-  padding-bottom: 12%;
-  background:
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.07) 0 8px, transparent 8px 16px),
-    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.07) 0 8px, transparent 8px 16px),
-    radial-gradient(ellipse at 50% 60%, #b01428, #6b0b18 80%);
-  box-shadow: inset 0 0 0 3px #d4a017, inset 0 0 1.5rem rgba(0, 0, 0, 0.5);
+    transform: rotateX(180deg);
+    display: grid;
+    place-items: end center;
+    padding-bottom: 12%;
+    background:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.07) 0 8px, transparent 8px 16px),
+        repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.07) 0 8px, transparent 8px 16px),
+        radial-gradient(ellipse at 50% 60%, #b01428, #6b0b18 80%);
+    box-shadow: inset 0 0 0 3px #d4a017, inset 0 0 1.5rem rgba(0, 0, 0, 0.5);
 }
-.case__lid-face--inner::after { /* dims the lining while a badge is in focus */
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: rgba(0, 0, 0, 0);
-  pointer-events: none;
-  transition: background 0.3s ease;
+
+.case__lid-face--inner::after {
+    /* dims the lining while a badge is in focus */
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(0, 0, 0, 0);
+    pointer-events: none;
+    transition: background 0.3s ease;
 }
-.case.is-focus .case__lid-face--inner::after { background: rgba(0, 0, 0, 0.55); }
+
+.case.is-focus .case__lid-face--inner::after {
+    background: rgba(0, 0, 0, 0.55);
+}
 
 .case__plaque {
-  padding: 0.35rem 1rem;
-  font: 800 clamp(0.65rem, 1.6vw, 0.9rem) / 1.2 ui-monospace, 'Courier New', monospace;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #3a2400;
-  background: linear-gradient(180deg, #fff0a8, #e0a800 55%, #b88400);
-  border: 2px solid #5a3b00;
-  border-radius: 0.25rem;
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    padding: 0.35rem 1rem;
+    font: 800 clamp(0.65rem, 1.6vw, 0.9rem) / 1.2 ui-monospace, 'Courier New', monospace;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #3a2400;
+    background: linear-gradient(180deg, #fff0a8, #e0a800 55%, #b88400);
+    border: 2px solid #5a3b00;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 /* ---------- Hinge: a brass barrel along the top edge, in front of both lid and tray ---------- */
 .case__hinge {
-  position: absolute;
-  top: -0.45rem;
-  right: 8%;
-  left: 8%;
-  z-index: 5;
-  height: 0.9rem;
-  border-radius: 0.45rem;
-  background:
-    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 3.2rem), /* knuckle gaps */
-    linear-gradient(180deg, #fff3b0 0%, #e0a800 35%, #8a6100 70%, #ffd75e 100%);        /* cylinder shading */
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+    position: absolute;
+    top: -0.45rem;
+    right: 8%;
+    left: 8%;
+    z-index: 5;
+    height: 0.9rem;
+    border-radius: 0.45rem;
+    background:
+        repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0 2px, transparent 2px 3.2rem),
+        /* knuckle gaps */
+        linear-gradient(180deg, #fff3b0 0%, #e0a800 35%, #8a6100 70%, #ffd75e 100%);
+    /* cylinder shading */
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
 /* ---------- Tray: leather frame around a red velvet interior ---------- */
 .case__tray {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  padding: clamp(0.4rem, 2%, 0.9rem);
-  border: 0.7rem solid #2b1a12;
-  border-radius: 0.9rem;
-  background:
-    radial-gradient(ellipse at 50% 15%, rgba(255, 255, 255, 0.14), transparent 60%),
-    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.08) 0 2px, transparent 2px 4px), /* velvet pile */
-    radial-gradient(ellipse at 50% 40%, #c0182a 0%, #8a0f1c 65%, #55080f 100%);
-  box-shadow:
-    inset 0 0 0 2px #d4a017,                  /* gold inner trim */
-    inset 0 0.5rem 1.4rem rgba(0, 0, 0, 0.5),
-    0 0.6rem 0 #1a0f0a,
-    0 1.2rem 1.6rem rgba(0, 0, 0, 0.45);
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    padding: clamp(0.4rem, 2%, 0.9rem);
+    border: 0.7rem solid #2b1a12;
+    border-radius: 0.9rem;
+    background:
+        radial-gradient(ellipse at 50% 15%, rgba(255, 255, 255, 0.14), transparent 60%),
+        repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.08) 0 2px, transparent 2px 4px),
+        /* velvet pile */
+        radial-gradient(ellipse at 50% 40%, #c0182a 0%, #8a0f1c 65%, #55080f 100%);
+    box-shadow:
+        inset 0 0 0 2px #d4a017,
+        /* gold inner trim */
+        inset 0 0.5rem 1.4rem rgba(0, 0, 0, 0.5),
+        0 0.6rem 0 #1a0f0a,
+        0 1.2rem 1.6rem rgba(0, 0, 0, 0.45);
 }
 
 /* Each badge sits in a recessed velvet slot */
 .case__slot {
-  position: relative; /* so a focused badge's z-index can lift it above the dim layer */
-  display: grid;
-  place-items: center;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 35%, rgba(0, 0, 0, 0.55), rgba(40, 0, 6, 0.35) 70%);
-  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    /* so a focused badge's z-index can lift it above the dim layer */
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, rgba(0, 0, 0, 0.55), rgba(40, 0, 6, 0.35) 70%);
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.55), 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* ---------- Focus layer: dim + detail card ---------- */
 .case__dim {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  border-radius: inherit;
-  background: radial-gradient(circle at 50% 35%, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.82));
-  opacity: 0;
-  pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    border-radius: inherit;
+    background: radial-gradient(circle at 50% 35%, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.82));
+    opacity: 0;
+    pointer-events: none;
 }
-.case.is-focus .case__dim { pointer-events: auto; cursor: zoom-out; }
+
+.case.is-focus .case__dim {
+    pointer-events: auto;
+    cursor: zoom-out;
+}
 
 .case__detail {
-  position: absolute;
-  right: 5%;
-  bottom: 5%;
-  left: 5%;
-  z-index: 15;
-  padding: 0.5rem 0.75rem;
-  background: #fffbe8;
-  border: 4px solid #1a1a40;
-  box-shadow: 4px 4px 0 #1a1a40;
-  opacity: 0;
-  pointer-events: none; /* hidden with opacity (not visibility) so it stays in the accessibility tree */
+    position: absolute;
+    right: 5%;
+    bottom: 5%;
+    left: 5%;
+    z-index: 15;
+    padding: 0.5rem 0.75rem;
+    background: #fffbe8;
+    border: 4px solid #1a1a40;
+    box-shadow: 4px 4px 0 #1a1a40;
+    opacity: 0;
+    pointer-events: none;
+    /* hidden with opacity (not visibility) so it stays in the accessibility tree */
 }
-.case.is-focus .case__detail { pointer-events: auto; }
+
+.case.is-focus .case__detail {
+    pointer-events: auto;
+}
 
 /* ---------- Close button: straddles the tray's bottom edge ---------- */
 .case__close {
-  position: absolute;
-  bottom: -1.4rem;
-  left: 50%;
-  z-index: 7;
-  translate: -50% 0; /* individual property: GSAP animates `transform`, so no clash */
-  padding: 0.4rem 0.9rem;
-  color: #1a1a40;
-  cursor: pointer;
-  background: #ffcb05;
-  border: 4px solid #1a1a40;
-  box-shadow: 3px 3px 0 #1a1a40;
-  visibility: hidden;
-  opacity: 0;
+    position: absolute;
+    bottom: -1.4rem;
+    left: 50%;
+    z-index: 7;
+    translate: -50% 0;
+    /* individual property: GSAP animates `transform`, so no clash */
+    padding: 0.4rem 0.9rem;
+    color: #1a1a40;
+    cursor: pointer;
+    background: #ffcb05;
+    border: 4px solid #1a1a40;
+    box-shadow: 3px 3px 0 #1a1a40;
+    visibility: hidden;
+    opacity: 0;
 }
-.case__close:hover { background: #ffe066; }
-.case__close:focus-visible { outline: 3px solid #3b4cca; outline-offset: 3px; }
+
+.case__close:hover {
+    background: #ffe066;
+}
+
+.case__close:focus-visible {
+    outline: 3px solid #3b4cca;
+    outline-offset: 3px;
+}
 
 /* ==========================================================================
    Gym badges
    ========================================================================== */
 .badge {
-  --a: #4ade80; /* face colours, set per sponsor inline */
-  --b: #15803d;
-  position: relative;
-  display: block;
-  width: 78%;
-  aspect-ratio: 1;
-  cursor: pointer;
-  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.55)); /* the shadow sits outside the clipped shapes */
-  transition: translate 0.2s ease, filter 0.2s ease;  /* `translate`, so it can't clash with GSAP's transform */
+    --a: #4ade80;
+    /* face colours, set per sponsor inline */
+    --b: #15803d;
+    position: relative;
+    display: block;
+    width: 78%;
+    aspect-ratio: 1;
+    cursor: pointer;
+    filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.55));
+    /* the shadow sits outside the clipped shapes */
+    transition: translate 0.2s ease, filter 0.2s ease;
+    /* `translate`, so it can't clash with GSAP's transform */
 }
+
 .badge:hover,
-.badge:focus-visible { translate: 0 -3px; filter: drop-shadow(0 6px 4px rgba(0, 0, 0, 0.6)); }
-.badge:focus-visible { outline: 3px solid #fff; outline-offset: 4px; border-radius: 50%; }
+.badge:focus-visible {
+    translate: 0 -3px;
+    filter: drop-shadow(0 6px 4px rgba(0, 0, 0, 0.6));
+}
+
+.badge:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 4px;
+    border-radius: 50%;
+}
 
 /* Shapes (each badge sets --shape; the face reuses it, inset, for a concentric rim) */
-.badge--hex      { --shape: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%); }
-.badge--diamond  { --shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
-.badge--round    { --shape: circle(50% at 50% 50%); }
-.badge--star     { --shape: polygon(50% 0, 63% 18.6%, 85.4% 14.6%, 81.4% 37%, 100% 50%, 81.4% 63%, 85.4% 85.4%, 63% 81.4%, 50% 100%, 37% 81.4%, 14.6% 85.4%, 18.6% 63%, 0 50%, 18.6% 37%, 14.6% 14.6%, 37% 18.6%); }
-.badge--octagon  { --shape: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); }
-.badge--shield   { --shape: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%); }
-.badge--drop     { --shape: polygon(50% 0, 78% 38%, 90% 62%, 80% 86%, 50% 100%, 20% 86%, 10% 62%, 22% 38%); }
-.badge--pentagon { --shape: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%); }
+.badge--hex {
+    --shape: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+}
+
+.badge--diamond {
+    --shape: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.badge--round {
+    --shape: circle(50% at 50% 50%);
+}
+
+.badge--star {
+    --shape: polygon(50% 0, 63% 18.6%, 85.4% 14.6%, 81.4% 37%, 100% 50%, 81.4% 63%, 85.4% 85.4%, 63% 81.4%, 50% 100%, 37% 81.4%, 14.6% 85.4%, 18.6% 63%, 0 50%, 18.6% 37%, 14.6% 14.6%, 37% 18.6%);
+}
+
+.badge--octagon {
+    --shape: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+}
+
+.badge--shield {
+    --shape: polygon(0 0, 100% 0, 100% 62%, 50% 100%, 0 62%);
+}
+
+.badge--drop {
+    --shape: polygon(50% 0, 78% 38%, 90% 62%, 80% 86%, 50% 100%, 20% 86%, 10% 62%, 22% 38%);
+}
+
+.badge--pentagon {
+    --shape: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%);
+}
 
 .badge__metal,
-.badge__face { position: absolute; clip-path: var(--shape); }
+.badge__face {
+    position: absolute;
+    clip-path: var(--shape);
+}
 
 /* Metallic rim */
-.badge__metal { inset: 0; }
-.badge--gold .badge__metal   { background: linear-gradient(135deg, #fff3b0 0%, #f5c400 28%, #a87400 52%, #ffe58a 74%, #c99a00 100%); }
-.badge--silver .badge__metal { background: linear-gradient(135deg, #ffffff 0%, #cfd6df 28%, #7e8896 52%, #eef2f7 74%, #9aa4b2 100%); }
-.badge__metal::after { /* rim highlight */
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), transparent 40%);
+.badge__metal {
+    inset: 0;
+}
+
+.badge--gold .badge__metal {
+    background: linear-gradient(135deg, #fff3b0 0%, #f5c400 28%, #a87400 52%, #ffe58a 74%, #c99a00 100%);
+}
+
+.badge--silver .badge__metal {
+    background: linear-gradient(135deg, #ffffff 0%, #cfd6df 28%, #7e8896 52%, #eef2f7 74%, #9aa4b2 100%);
+}
+
+.badge__metal::after {
+    /* rim highlight */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), transparent 40%);
 }
 
 /* Coloured face with the sponsor's mark */
 .badge__face {
-  inset: 14%;
-  display: grid;
-  place-items: center;
-  background: radial-gradient(circle at 35% 30%, var(--a), var(--b) 80%);
-  box-shadow: inset 0 0 0.6rem rgba(0, 0, 0, 0.45);
+    inset: 14%;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(circle at 35% 30%, var(--a), var(--b) 80%);
+    box-shadow: inset 0 0 0.6rem rgba(0, 0, 0, 0.45);
 }
+
 .badge__mark {
-  font: 800 clamp(0.7rem, 2vw, 1.3rem) / 1 ui-monospace, 'Courier New', monospace;
-  color: #fff;
-  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+    font: 800 clamp(0.7rem, 2vw, 1.3rem) / 1 ui-monospace, 'Courier New', monospace;
+    color: #fff;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
 }
-.badge__logo { width: 100%; height: 100%; object-fit: contain; }
+
+.badge__logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
 /* Shiny glare: a fixed highlight plus a streak that sweeps across on hover/focus */
 .badge__face::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.7) 46%, transparent 60%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.4), transparent 45%);
-  background-size: 250% 100%, 100% 100%;
-  background-position: 120% 0, 0 0;
-  background-repeat: no-repeat;
-  transition: background-position 0.8s ease;
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.7) 46%, transparent 60%),
+        linear-gradient(160deg, rgba(255, 255, 255, 0.4), transparent 45%);
+    background-size: 250% 100%, 100% 100%;
+    background-position: 120% 0, 0 0;
+    background-repeat: no-repeat;
+    transition: background-position 0.8s ease;
 }
+
 .badge:hover .badge__face::after,
-.badge:focus-visible .badge__face::after { background-position: -20% 0, 0 0; }
+.badge:focus-visible .badge__face::after {
+    background-position: -20% 0, 0 0;
+}
 
 /* ==========================================================================
    Home: battlefield
    Everything inside is sized in cqw (1% of the battlefield's width), so the whole scene,
    sprites and effects included, scales as one picture.
    ========================================================================== */
+#home {
+    background: url('/images/main-bg.jpeg') center / cover no-repeat;
+    position: relative;
+}
+
+#home:not(.hidden) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    #home {
+        background-attachment: fixed;
+    }
+}
+
 .battlefield {
-  --cycle: 7s; /* length of one full exchange of attacks */
-  position: relative;
-  aspect-ratio: 9 / 4; /* room for the pitch (bottom) and the sprites standing above it */
-  container-type: inline-size;
+    --cycle: 7s;
+    /* length of one full exchange of attacks */
+    position: relative;
+    aspect-ratio: 9 / 4;
+    /* room for the pitch (bottom) and the sprites standing above it */
+    container-type: inline-size;
 }
 
 /* The pitch is drawn flat, then tilted back. The perspective is in cqw so the
    "camera" scales with the scene (px would flatten it on phones). */
 .battlefield__stage {
-  position: absolute;
-  inset: 0;
-  perspective: 1000px; /* fallback */
-  perspective: 115cqw;
+    position: absolute;
+    inset: 0;
+    perspective: 1000px;
+    /* fallback */
+    perspective: 115cqw;
 }
+
 .field {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  aspect-ratio: 900 / 480;
-  transform-origin: 50% 100%;
-  transform: rotateX(62deg);
-  background:
-    radial-gradient(ellipse at 50% 55%, rgba(255, 255, 255, 0.22), transparent 65%),
-    linear-gradient(180deg, #f1bd5f 0%, #f7d58c 55%, #f4c872 100%); /* sand */
-  border: 1.2cqw solid #e29a33; /* clay border */
-  border-radius: 1.2cqw;
-  box-shadow: inset 0 0 0 0.5cqw rgba(255, 255, 255, 0.25);
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    aspect-ratio: 900 / 480;
+    transform-origin: 50% 100%;
+    transform: rotateX(62deg);
+    background:
+        radial-gradient(ellipse at 50% 55%, rgba(255, 255, 255, 0.22), transparent 65%),
+        linear-gradient(180deg, #f1bd5f 0%, #f7d58c 55%, #f4c872 100%);
+    /* sand */
+    border: 1.2cqw solid #e29a33;
+    /* clay border */
+    border-radius: 1.2cqw;
+    box-shadow: inset 0 0 0 0.5cqw rgba(255, 255, 255, 0.25);
 }
-.field::before { /* white boundary + centre line */
-  content: '';
-  position: absolute;
-  inset: 4% 3%;
-  border: 0.6cqw solid rgba(255, 255, 255, 0.95);
-  background: linear-gradient(
-    90deg,
-    transparent calc(50% - 0.3cqw),
-    rgba(255, 255, 255, 0.95) calc(50% - 0.3cqw) calc(50% + 0.3cqw),
-    transparent calc(50% + 0.3cqw)
-  );
+
+.field::before {
+    /* white boundary + centre line */
+    content: '';
+    position: absolute;
+    inset: 4% 3%;
+    border: 0.6cqw solid rgba(255, 255, 255, 0.95);
+    background: linear-gradient(90deg,
+            transparent calc(50% - 0.3cqw),
+            rgba(255, 255, 255, 0.95) calc(50% - 0.3cqw) calc(50% + 0.3cqw),
+            transparent calc(50% + 0.3cqw));
 }
-.field::after { /* centre circle + dot */
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  height: 34%;
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  border: 0.6cqw solid rgba(255, 255, 255, 0.95);
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 0 5%, transparent 6%);
+
+.field::after {
+    /* centre circle + dot */
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 34%;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border: 0.6cqw solid rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0 5%, transparent 6%);
 }
-.field__box { /* the two side boxes */
-  position: absolute;
-  top: 28%;
-  width: 17%;
-  height: 44%;
-  border: 0.6cqw solid rgba(255, 255, 255, 0.95);
+
+.field__box {
+    /* the two side boxes */
+    position: absolute;
+    top: 28%;
+    width: 17%;
+    height: 44%;
+    border: 0.6cqw solid rgba(255, 255, 255, 0.95);
 }
-.field__box--l { left: 3%; }
-.field__box--r { right: 3%; }
+
+.field__box--l {
+    left: 3%;
+}
+
+.field__box--r {
+    right: 3%;
+}
 
 /* ---------- Sprites ----------
    Greninja (seen from behind) stands on the near side, Sceptile on the far side, so he is smaller.
    Tune left/right/bottom/width to put their feet where you want them. */
 .battlefield__mon {
-  --shadow: drop-shadow(0 0.5cqw 0.4cqw rgba(0, 0, 0, 0.35));
-  position: absolute;
-  height: auto;
-  pointer-events: none;
-  user-select: none;
-  filter: var(--shadow) brightness(1);
+    --shadow: drop-shadow(0 0.5cqw 0.4cqw rgba(0, 0, 0, 0.35));
+    position: absolute;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+    filter: var(--shadow) brightness(1);
 }
+
 .battlefield__mon--ally {
-  bottom: 7cqw;
-  left: 12cqw;
-  z-index: 2;
-  width: 20cqw;
-  animation: battle-ally var(--cycle) linear infinite;
+    bottom: 7cqw;
+    left: 12cqw;
+    z-index: 2;
+    width: 20cqw;
+    animation: battle-ally var(--cycle) linear infinite;
 }
+
 .battlefield__mon--foe {
-  right: 16cqw;
-  bottom: 10cqw;
-  z-index: 1;
-  width: 14cqw;
-  animation: battle-foe var(--cycle) linear infinite;
+    right: 16cqw;
+    bottom: 10cqw;
+    z-index: 1;
+    width: 14cqw;
+    animation: battle-foe var(--cycle) linear infinite;
 }
 
 /* ---------- Attack effects (invisible except during their moment of the loop) ---------- */
 .fx {
-  position: absolute;
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0;
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
 }
 
 /* Greninja: Water Shuriken, a spinning four-pointed star */
 .fx-shuriken {
-  bottom: 15cqw;
-  left: 36cqw;
-  width: 7cqw;
-  aspect-ratio: 1;
-  filter: drop-shadow(0 0 1cqw #6fd3ff) drop-shadow(0 0 0.4cqw #fff); /* glow sits on the wrapper: clip-path would cut it */
-  animation: fx-shuriken var(--cycle) linear infinite;
+    bottom: 15cqw;
+    left: 36cqw;
+    width: 7cqw;
+    aspect-ratio: 1;
+    filter: drop-shadow(0 0 1cqw #6fd3ff) drop-shadow(0 0 0.4cqw #fff);
+    /* glow sits on the wrapper: clip-path would cut it */
+    animation: fx-shuriken var(--cycle) linear infinite;
 }
+
 .fx-shuriken::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle, #f4feff 0 18%, #7fdcff 40%, #1d7fe0 85%);
-  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, #f4feff 0 18%, #7fdcff 40%, #1d7fe0 85%);
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
 }
 
 /* Sceptile: Dragon Pulse, a glowing energy orb with a trailing ring */
 .fx-pulse {
-  bottom: 18cqw;
-  left: 62cqw;
-  width: 8cqw;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, #f2fff7 0 20%, #7dffb2 38%, #19c37d 62%, rgba(25, 195, 125, 0) 72%);
-  box-shadow: 0 0 2cqw 0.6cqw rgba(60, 255, 170, 0.65);
-  animation: fx-pulse var(--cycle) linear infinite;
+    bottom: 18cqw;
+    left: 62cqw;
+    width: 8cqw;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, #f2fff7 0 20%, #7dffb2 38%, #19c37d 62%, rgba(25, 195, 125, 0) 72%);
+    box-shadow: 0 0 2cqw 0.6cqw rgba(60, 255, 170, 0.65);
+    animation: fx-pulse var(--cycle) linear infinite;
 }
+
 .fx-pulse::after {
-  content: '';
-  position: absolute;
-  inset: -30%;
-  border: 0.5cqw solid rgba(125, 255, 178, 0.8);
-  border-radius: 50%;
-  animation: fx-ring 0.45s ease-out infinite;
+    content: '';
+    position: absolute;
+    inset: -30%;
+    border: 0.5cqw solid rgba(125, 255, 178, 0.8);
+    border-radius: 50%;
+    animation: fx-ring 0.45s ease-out infinite;
 }
 
 /* Impact bursts, centred on the sprite that gets hit */
 .fx-hit {
-  width: 14cqw;
-  aspect-ratio: 1;
-  border-radius: 50%;
+    width: 14cqw;
+    aspect-ratio: 1;
+    border-radius: 50%;
 }
+
 .fx-hit--foe {
-  bottom: 14cqw;
-  left: 68cqw;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0, rgba(111, 211, 255, 0.85) 30%, rgba(29, 127, 224, 0) 66%);
-  animation: fx-hit-foe var(--cycle) linear infinite;
+    bottom: 14cqw;
+    left: 68cqw;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0, rgba(111, 211, 255, 0.85) 30%, rgba(29, 127, 224, 0) 66%);
+    animation: fx-hit-foe var(--cycle) linear infinite;
 }
+
 .fx-hit--ally {
-  bottom: 9cqw;
-  left: 18cqw;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0, rgba(125, 255, 178, 0.85) 30%, rgba(25, 195, 125, 0) 66%);
-  animation: fx-hit-ally var(--cycle) linear infinite;
+    bottom: 9cqw;
+    left: 18cqw;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0, rgba(125, 255, 178, 0.85) 30%, rgba(25, 195, 125, 0) 66%);
+    animation: fx-hit-ally var(--cycle) linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .battlefield__mon,
-  .fx { animation: none; }
-  .fx { display: none; }
+
+    .battlefield__mon,
+    .fx {
+        animation: none;
+    }
+
+    .fx {
+        display: none;
+    }
 }
+
 /* ---------- PS / Theme section ---------- */
 .theme {
-  background: url('/images/lab-bg.jpg') center / cover no-repeat; /* covers the full width of the section */
+    background: url('/images/lab-bg.png') center / cover no-repeat;
+    /* covers the full width of the section */
 }
 
 /* Pokémon in the bottom-right corner. It sits a little in from the edge on purpose:
    the Oak widget is fixed in that exact corner and would cover it otherwise. */
 .theme__mon {
-  position: absolute;
-  right: clamp(8rem, 14vw, 12rem);
-  bottom: 0;
-  width: clamp(6.5rem, 16vw, 12rem);
-  height: auto;
-  pointer-events: none;
-  user-select: none;
-  filter: drop-shadow(0 0.5rem 0.4rem rgba(0, 0, 0, 0.4));
+    position: absolute;
+    right: clamp(8rem, 14vw, 12rem);
+    bottom: 0;
+    width: clamp(6.5rem, 16vw, 12rem);
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 0.5rem 0.4rem rgba(0, 0, 0, 0.4));
 }
 
 /* ---------- Glassmorphism card ---------- */
 .glass-card {
-  background: rgba(12, 20, 40, 0.42); /* dark-tinted glass keeps white text readable on any lab background */
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 1.5rem;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),   /* top-edge highlight */
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+    background: rgba(12, 20, 40, 0.42);
+    /* dark-tinted glass keeps white text readable on any lab background */
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 1.5rem;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        /* top-edge highlight */
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08);
 }
+
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass-card { background: rgba(12, 20, 40, 0.82); } /* no blur available: make it more opaque instead */
+    .glass-card {
+        background: rgba(12, 20, 40, 0.82);
+    }
+
+    /* no blur available: make it more opaque instead */
 }
